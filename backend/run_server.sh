@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-APP_MODULE="furry-frontiers.backend.server:app"  # Change this to your app's module
+APP_MODULE="server:app"  # Change this to your app's module
 HOST="0.0.0.0"         # Change this to the desired host
 PORT="8000"            # Change this to the desired port
 LOG_LEVEL="info"       # Change this to your desired log level (debug, info, warning, error, critical)
