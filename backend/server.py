@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 import os
 
 app = FastAPI()
@@ -13,9 +14,13 @@ if not os.path.exists(static_directory):
 
 app.mount("/", StaticFiles(directory=static_directory, html=True), name="static")
 
-@app.get("/api")
-def get_data():
-    return {"data": "This is your API endpoint"}
+@app.get("/")
+async def get_index():
+    index_path = os.path.join(static_directory, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    else:
+        return {"error": "index.html not found"}
 
 if __name__ == "__main__":
     import uvicorn
