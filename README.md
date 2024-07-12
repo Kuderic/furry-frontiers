@@ -4,7 +4,7 @@
 
 ## 😸 Server
 
-The server code is made using the FastAPI, Uvicorn, and websockets.
+The server code is made using FastAPI, Uvicorn, and websockets.
 
 The server is meant to be hosted on an AWS EC2 virtual machine, but you can host it on your own machine, too. Just make sure that you open all the ports and connections correctly.
 
