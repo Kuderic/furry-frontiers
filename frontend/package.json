@@ -1,0 +1,17 @@
+{
+  "name": "front-end",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx parcel serve src/index.html",
+    "build": "npx parcel build src/index.html --dist-dir ../backend/static"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "phaser": "^3.80.1"
+  },
+  "devDependencies": {
+    "parcel": "^2.12.0"
+  }
+}
