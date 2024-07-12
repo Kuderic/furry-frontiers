@@ -2,11 +2,11 @@
 
 You will need to use npm to install the client-side dependencies. from this folder run
 ```
-npm i parcel
-npm i phaser
+npm install
 ```
 
 And then to build the client you run
+
 ```
 npm run build
 ```
@@ -23,14 +23,10 @@ If you are changing client files and want them to automatically rebuild, you can
 npm install --save-dev nodemon
 ```
 
-Then add this to package.json:
-
-```
-    "watch": "nodemon --watch src --watch static --exec \"npm run build\""
-```
-
 And then start nodemon using
 
 ```
     npm run watch
 ```
+
+Then, whenever a file in src is changed, parcel will automatically rebuild the static files for the server.
