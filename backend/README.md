@@ -1,37 +1,42 @@
 # Server
 
-The server is meant to be hosted on an AWS EC2 virtual machine running Amazon Linux 2, but you can host it on your own machine, too. Just make sure that you open all the ports and connections correctly.
+There are two ways to run the server. One is in local testing mode, and the other is opening a server to the internet.
 
-# Installation
+For online mode, the server is developed to be hosted on an AWS EC2 virtual machine running Amazon Linux 2, but you can probably host it on your own machine, too.
 
-## Installing Dependencies
+## Online Server Hosting
 
-Run this command to install the required dependencies. I recommend creating a python virtual environment for this.
+You can either use Docker or simply run uvicorn locally.
+
+1. Running in a Docker container:
+
+Build docker container
+
+```
+docker build -t furry-frontiers .
+```
+
+Then use this command
+
+```bash
+./run_server.sh
+```
+
+2. Running without docker:
+
+First install all python dependencies.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Server Hosting
-
-There are two ways to run the server. One is in local testing mode, and the other is opening the server to the internet.
-
-###  1. Local Server Testing
-
-Run in the terminal `python server.py`, and then go to `localhost:8000` in a browser.
-
-### 2. Server Hosting
-
-Can either use Docker or simply run uvicorn locally.
-
-Running in a Docker container:
-
-```bash
-source run_server.sh
-```
-
-Running without docker:
+Then run the server
 
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
+
+
+## Local Server Testing
+
+Run in the terminal `python server.py`, and then go to `localhost:8000` in a browser.
