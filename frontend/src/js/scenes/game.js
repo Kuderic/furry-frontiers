@@ -21,6 +21,7 @@ export default class GameScene extends Phaser.Scene {
 
     create() {
         this.setBounds();
+        this.setUpCamera();
         this.createMainPlayer();
         this.createGameUI();
         this.generateWorld();
@@ -29,6 +30,13 @@ export default class GameScene extends Phaser.Scene {
 
     update() {
         this.updatePlayer();
+    }
+
+    setUpCamera() {
+        // Make the camera zoom out more on mobile
+        if (this.isMobile) {
+            this.cameras.main.setZoom(0.7);
+        }
     }
 
     createGameUI() {
