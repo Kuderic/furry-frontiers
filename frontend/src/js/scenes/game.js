@@ -1,4 +1,9 @@
 import Phaser from 'phaser';
+import Player from '../utils/player';
+import GrassGenerator from '../utils/grass-generator';
+
+const WORLD_WIDTH = 3000;
+const WORLD_HEIGHT = 3000;
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -6,22 +11,43 @@ export default class GameScene extends Phaser.Scene {
     }
     
     preload() {
+        this.cameras.main.setBackgroundColor('#457237');
+        this.generateWorld();
+        this.physics.world.bounds.width = WORLD_WIDTH;
+        this.physics.world.bounds.height = WORLD_HEIGHT;
+        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     }
 
     create() {
-        const logo = this.add.image(400, 800, 'wolf')
-        logo.displayWidth = 500;
-        logo.displayHeight = 500;
-        this.tweens.add({
-            targets: logo,
-            y: 400,
-            duration: 2000,
-            ease: 'Power2',
-            yoyo: true,
-            loop: -1
-        });
+        this.addInput();
+
+        this.grassGenerator = new GrassGenerator(this);
+        this.grassGenerator.generateGrass();
+
+        this.createMainPlayer();
     }
 
     update() {
+    }
+
+    createMainPlayer() {
+        let player = new Player(this, 500, 500, "bunny1", this.registry.get('playerName'));
+        player.setDisplaySize(150, 150);
+        player.setSize(150, 150);
+        this.player = player;
+        this.cameras.main.startFollow(player, true, 0.1, 0.1);
+    }
+
+    addInput() {
+        this.keys = this.input.keyboard?.addKeys({
+            'up': Phaser.Input.Keyboard.KeyCodes.W,
+            'left': Phaser.Input.Keyboard.KeyCodes.A,
+            'down': Phaser.Input.Keyboard.KeyCodes.S,
+            'right': Phaser.Input.Keyboard.KeyCodes.D,
+        })
+    }
+
+    generateWorld() {
+        console.log("generating world");
     }
 }

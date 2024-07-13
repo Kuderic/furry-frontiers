@@ -9,18 +9,22 @@ export default class Button extends Phaser.GameObjects.Container {
      * @param {number} [config.width=100] - The width of the button
      * @param {number} [config.height=50] - The height of the button
      * @param {string} [config.text="Button"] - The text of the button
+     * @param {string} [config.img="blue-button-medium"] - The image of the button
+     * @param {string} [config.imgPressed="blue-button-medium-pressed"] - The image of the button when pressed
      * @param {() => void} config.callback - The callback function when the button is clicked
      */
-    constructor(scene, { x, y, width = 100, height = 50, text = "Button", callback }) {
+    constructor(scene, { x, y, width = 100, height = 50, text = "Button",
+        img = "blue-button-medium", imgPressed = "blue-button-medium-pressed", callback }) {
+
         super(scene, x, y);
 
         // Create button background images
-        this.buttonUp = scene.add.image(0, 0, 'blue-button-medium');
-        this.buttonDown = scene.add.image(0, 0, 'blue-button-medium-pressed');
+        this.buttonUp = scene.add.image(0, 0, img);
+        this.buttonDown = scene.add.image(0, 0, imgPressed);
         this.buttonDown.setVisible(false);
 
         // Add button text
-        this.buttonText = scene.add.bitmapText(0, 0, 'rainyhearts', text, 32);
+        this.buttonText = scene.add.bitmapText(0, 0, 'rainyhearts', text, 24);
         this.buttonText.setOrigin(0.5);
 
         // Scale everything
@@ -56,12 +60,11 @@ export default class Button extends Phaser.GameObjects.Container {
         });
 
         this.on('pointerup', () => {
+            scene.sound.play('select', {volume : 0.25});
+            scene.input.setDefaultCursor('default');
             this.setPressedAnimation(false);
             callback();
         });
-
-        // Add this container to the scene
-        scene.add.existing(this);
     }
 
     /**

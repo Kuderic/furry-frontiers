@@ -5,34 +5,21 @@ export default class LoadingScene extends Phaser.Scene {
         super({ key: 'LoadingScene' });
     }
     loadAssets() {
+        this.load.image("bunny1", new URL(`../../assets/images/bunny1.png`, import.meta.url).toString());
+        this.load.image("bunny2", new URL(`../../assets/images/bunny2.png`, import.meta.url).toString());
+        this.load.image("bunny3", new URL(`../../assets/images/bunny3.png`, import.meta.url).toString());
         this.load.image("wolf", new URL(`../../assets/images/wolf.png`, import.meta.url).toString());
+
+        this.load.image("grass1", new URL(`../../assets/images/grass1.png`, import.meta.url).toString());
+
         this.load.image("furry-frontiers", new URL(`../../assets/images/furry-frontiers.png`, import.meta.url).toString());
         this.load.image("blue-button-medium", new URL(`../../assets/images/blue-button-medium.png`, import.meta.url).toString());
         this.load.image("blue-button-medium-pressed", new URL(`../../assets/images/blue-button-medium-pressed.png`, import.meta.url).toString());
+
+        this.load.audio("background-music", new URL(`../../assets/sounds/background-music.mp3`, import.meta.url).toString());
+        this.load.audio("shoot", new URL(`../../assets/sounds/shoot.wav`, import.meta.url).toString());
+        this.load.audio("select", new URL(`../../assets/sounds/select.wav`, import.meta.url).toString());
     }
-
-    // I would use the below, but it doesnt work with parcel :(
-    
-    // loadAssets() {
-    //     let images = [
-    //         'wolf',
-    //         'furry-frontiers',
-    //         'blue-button-medium',
-    //         'blue-button-medium-pressed'
-    //     ];
-    //     let sounds = [
-    //         'billie-eilish-meow'
-    //     ];
-
-    //     for (let i = 0; i < images.length; i++) {
-    //         const name = images[i];
-    //         this.load.image(name, new URL(`../../assets/images/${name}.png`, import.meta.url).toString());
-    //     }
-    //     for (let i = 0; i < sounds.length; i++) {
-    //         const name = sounds[i];
-    //         this.load.audio(name, new URL(`../../assets/sounds/${name}.mp3`, import.meta.url).toString());
-    //     }
-    // }
 
 
     preload() {
@@ -56,6 +43,7 @@ export default class LoadingScene extends Phaser.Scene {
 
         // Load assets
         this.load.on('progress', (value) => {
+            console.log("loading progress:", value);
             progressBar.clear();
             progressBar.fillStyle(0xffffff, 1);
             progressBar.fillRect(this.cameras.main.centerX - 150, this.cameras.main.centerY - 20, 300 * value, 30);

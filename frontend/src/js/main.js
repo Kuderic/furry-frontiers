@@ -3,10 +3,11 @@ import Phaser from 'phaser';
 import LoadingScene from './scenes/loading.js';
 import MainMenuScene from './scenes/main-menu.js';
 import GameScene from './scenes/game.js';
+import CharacterSelectScene from './scenes/character-select.js';
 
 const phaser_config = {
     type: Phaser.WEBGL,
-    scene: [LoadingScene, MainMenuScene, GameScene],
+    scene: [LoadingScene, MainMenuScene, CharacterSelectScene, GameScene],
     // parent: 'gameContainer',
     scale: {
         mode: Phaser.Scale.RESIZE,  // Adjust to RESIZE to have the canvas resize dynamically
@@ -32,6 +33,13 @@ const phaser_config = {
 }
 
 const game = new Phaser.Game(phaser_config);
+let isMobile = false;
 
-// Log the renderer type
+if (game.device.os.android || game.device.os.iOS) {
+    isMobile = true;
+} else {
+    isMobile = false;
+}
+
+console.log(`Is Mobile? ${isMobile}`);
 console.log(`Renderer used: ${game.renderer.type === Phaser.WEBGL ? 'WebGL' : 'Canvas'}`);
