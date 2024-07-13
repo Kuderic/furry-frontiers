@@ -27,7 +27,7 @@ const phaser_config = {
         min: 10,
         target: 165,
         forceSetTimeOut: false,
-        deltaHistory: 5,
+        deltaHistory: 2,
         panicMax: 120
     },
     transparent: true
