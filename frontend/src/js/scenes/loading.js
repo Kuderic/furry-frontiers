@@ -9,16 +9,15 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image("bunny2", new URL(`../../assets/images/bunny2.png`, import.meta.url).toString());
         this.load.image("bunny3", new URL(`../../assets/images/bunny3.png`, import.meta.url).toString());
         this.load.image("wolf", new URL(`../../assets/images/wolf.png`, import.meta.url).toString());
+        this.load.image("grass1", new URL(`../../assets/images/grass1.png`, import.meta.url).toString());
+        this.load.image("furry-frontiers", new URL(`../../assets/images/furry-frontiers.webp`, import.meta.url).toString());
+
+        this.load.image("blue-button-medium", new URL(`../../assets/images/blue-button-medium.png`, import.meta.url).toString());
+        this.load.image("blue-button-medium-pressed", new URL(`../../assets/images/blue-button-medium-pressed.png`, import.meta.url).toString());
         this.load.image("joy", new URL(`../../assets/images/wolf.png`, import.meta.url).toString());
         this.load.image("joystick", new URL(`../../assets/images/joystick.png`, import.meta.url).toString());
         this.load.image("mute", new URL(`../../assets/images/mute.png`, import.meta.url).toString());
         this.load.image("unmute", new URL(`../../assets/images/unmute.png`, import.meta.url).toString());
-
-        this.load.image("grass1", new URL(`../../assets/images/grass1.png`, import.meta.url).toString());
-
-        this.load.image("furry-frontiers", new URL(`../../assets/images/furry-frontiers.png`, import.meta.url).toString());
-        this.load.image("blue-button-medium", new URL(`../../assets/images/blue-button-medium.png`, import.meta.url).toString());
-        this.load.image("blue-button-medium-pressed", new URL(`../../assets/images/blue-button-medium-pressed.png`, import.meta.url).toString());
 
         // this.load.audio("background-music", new URL(`../../assets/sounds/background-music.mp3`, import.meta.url).toString());
         this.load.audio("shoot", new URL(`../../assets/sounds/shoot.wav`, import.meta.url).toString());
