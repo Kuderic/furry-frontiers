@@ -1,9 +1,6 @@
 import Phaser from 'phaser';
 import Player from '../utils/player';
 import GrassGenerator from '../utils/grass-generator';
-import GameUIScene from './game-ui';
-
-// import rexvirtualjoystickplugin from './plugins/rexvirtualjoystickplugin.min.js';
 
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 2000;
@@ -14,17 +11,15 @@ export default class GameScene extends Phaser.Scene {
     }
     
     preload() {
+        if (this.input.mouse) {
+            this.input.mouse.disableContextMenu();
+        }
+        this.cameras.main.setBackgroundColor('#457237');
         this.isMobile = this.registry.get('isMobile');
         // this.isMobile = true;
     }
 
     create() {
-        if (this.input.mouse) {
-            this.input.mouse.disableContextMenu();
-        }
-        
-        this.cameras.main.setBackgroundColor('#457237');
-
         this.setBounds();
         this.createMainPlayer();
         this.createGameUI();
@@ -34,6 +29,39 @@ export default class GameScene extends Phaser.Scene {
 
     update() {
         this.updatePlayer();
+    }
+
+    createGameUI() {
+        this.scene.launch('GameUIScene');
+        this.uiScene = this.scene.get('GameUIScene');
+    }
+
+    setBounds() {
+        this.physics.world.bounds.width = WORLD_WIDTH;
+        this.physics.world.bounds.height = WORLD_HEIGHT;
+        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    }
+
+    createMainPlayer() {
+        this.player = new Player(this, 500, 500, "bunny1", this.registry.get('playerName'));
+        this.player.setDisplaySize(150, 150);
+        this.player.setSize(150, 150);
+        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    }
+
+    addKeyboardInput() {
+        this.keys = this.input.keyboard?.addKeys({
+            'up': Phaser.Input.Keyboard.KeyCodes.W,
+            'left': Phaser.Input.Keyboard.KeyCodes.A,
+            'down': Phaser.Input.Keyboard.KeyCodes.S,
+            'right': Phaser.Input.Keyboard.KeyCodes.D,
+        })
+    }
+
+    generateWorld() {
+        console.log("generating grass");
+        this.grassGenerator = new GrassGenerator(this);
+        this.grassGenerator.generateGrass();
     }
 
     addInput() {
@@ -106,26 +134,6 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
-    calculateKeyboardMovement() {
-        if (!this.player) {
-            throw new Error("no player");
-        }
-        if (this.input.keyboard) {
-            if (this.keys.left.isDown) {
-                this.player.setVelocityX(-1 * this.player.speed);
-            }
-            if (this.keys.right.isDown) {
-                this.player.setVelocityX(this.player.speed);
-            }
-            if (this.keys.up.isDown) {
-                this.player.setVelocityY(-1 * this.player.speed);
-            }
-            if (this.keys.down.isDown) {
-                this.player.setVelocityY(this.player.speed);
-            }
-        }
-    }
-
     handleJoyStickInput() { 
         // Joystick movement
         if (!this.isMobile) {
@@ -157,36 +165,23 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
-    createGameUI() {
-        this.scene.launch('GameUIScene');
-        this.uiScene = this.scene.get('GameUIScene');
-    }
-
-    setBounds() {
-        this.physics.world.bounds.width = WORLD_WIDTH;
-        this.physics.world.bounds.height = WORLD_HEIGHT;
-        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    }
-
-    createMainPlayer() {
-        this.player = new Player(this, 500, 500, "bunny1", this.registry.get('playerName'));
-        this.player.setDisplaySize(150, 150);
-        this.player.setSize(150, 150);
-        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-    }
-
-    addKeyboardInput() {
-        this.keys = this.input.keyboard?.addKeys({
-            'up': Phaser.Input.Keyboard.KeyCodes.W,
-            'left': Phaser.Input.Keyboard.KeyCodes.A,
-            'down': Phaser.Input.Keyboard.KeyCodes.S,
-            'right': Phaser.Input.Keyboard.KeyCodes.D,
-        })
-    }
-
-    generateWorld() {
-        console.log("generating grass");
-        this.grassGenerator = new GrassGenerator(this);
-        this.grassGenerator.generateGrass();
+    calculateKeyboardMovement() {
+        if (!this.player) {
+            throw new Error("no player");
+        }
+        if (this.input.keyboard) {
+            if (this.keys.left.isDown) {
+                this.player.setVelocityX(-1 * this.player.speed);
+            }
+            if (this.keys.right.isDown) {
+                this.player.setVelocityX(this.player.speed);
+            }
+            if (this.keys.up.isDown) {
+                this.player.setVelocityY(-1 * this.player.speed);
+            }
+            if (this.keys.down.isDown) {
+                this.player.setVelocityY(this.player.speed);
+            }
+        }
     }
 }
