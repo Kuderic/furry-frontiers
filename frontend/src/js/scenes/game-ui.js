@@ -41,8 +41,23 @@ export default class GameUIScene extends Phaser.Scene {
         this.muteButton.on('pointerout', () => {
             this.input.setDefaultCursor('default');
         });
+
+        // Add resize event listener
+        window.addEventListener('resize', this.resizeUI.bind(this));
     }
     
+    resizeUI() {
+        if (!this.uiCamera || !this.fpsText || !this.muteButton) {
+            return;
+        }
+        const width = this.game.canvas.width;
+        const height = this.game.canvas.height;
+        this.uiCamera.setSize(width, height);
+
+        // Reposition and resize UI elements as needed
+        this.fpsText.setPosition(width - 150, 25);
+        this.muteButton.setPosition(50, 50);
+    }
 
     update() {
         if (this.fpsText) {
