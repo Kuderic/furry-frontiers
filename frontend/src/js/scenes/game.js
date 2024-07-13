@@ -17,7 +17,7 @@ export default class GameScene extends Phaser.Scene {
         }
         this.cameras.main.setBackgroundColor('#457237');
         this.isMobile = this.registry.get('isMobile');
-        this.isMobile = true;
+        // this.isMobile = true;
     }
 
     create() {
