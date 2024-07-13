@@ -65,6 +65,8 @@ export default class Button extends Phaser.GameObjects.Container {
             this.setPressedAnimation(false);
             callback();
         });
+
+        scene.add.existing(this);
     }
 
     /**

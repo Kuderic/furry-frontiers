@@ -7,8 +7,8 @@ import CharacterSelectScene from './scenes/character-select.js';
 
 const phaser_config = {
     type: Phaser.WEBGL,
+    parent: 'gameContainer',
     scene: [LoadingScene, MainMenuScene, CharacterSelectScene, GameScene],
-    // parent: 'gameContainer',
     scale: {
         mode: Phaser.Scale.RESIZE,  // Adjust to RESIZE to have the canvas resize dynamically
         autoCenter: Phaser.Scale.CENTER_BOTH // Center the game canvas in the parent
@@ -33,8 +33,8 @@ const phaser_config = {
 }
 
 const game = new Phaser.Game(phaser_config);
-let isMobile = false;
 
+let isMobile = false;
 if (game.device.os.android || game.device.os.iOS) {
     isMobile = true;
 } else {

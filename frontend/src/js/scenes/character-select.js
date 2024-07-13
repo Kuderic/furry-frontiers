@@ -10,6 +10,9 @@ export default class CharacterSelectScene extends Phaser.Scene {
     }
 
     create() {
+        if (this.input.mouse) {
+            this.input.mouse.disableContextMenu();
+        }
         // Add input field for character name
         const nameInput = document.createElement('input');
         nameInput.type = 'text';
@@ -20,12 +23,12 @@ export default class CharacterSelectScene extends Phaser.Scene {
         // Create a button instance
         const x = this.cameras.main.width / 2;
         const y = this.cameras.main.height / 2 + 75;
-        this.add.existing(new Button(this, {
+        new Button(this, {
             x: x,
             y: y,
             text: 'Start',
             callback: () => this.startGame()
-        }));
+        });
     }
 
     startGame() {

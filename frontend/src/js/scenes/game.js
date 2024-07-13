@@ -12,19 +12,23 @@ export default class GameScene extends Phaser.Scene {
     }
     
     preload() {
-        this.cameras.main.setBackgroundColor('#457237');
-        this.generateWorld();
-        this.physics.world.bounds.width = WORLD_WIDTH;
-        this.physics.world.bounds.height = WORLD_HEIGHT;
-        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     }
 
     create() {
-        this.addInput();
+        if (this.input.mouse) {
+            this.input.mouse.disableContextMenu();
+        }
+
+        this.cameras.main.setBackgroundColor('#457237');
+        this.physics.world.bounds.width = WORLD_WIDTH;
+        this.physics.world.bounds.height = WORLD_HEIGHT;
+        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
         this.grassGenerator = new GrassGenerator(this);
         this.grassGenerator.generateGrass();
 
+        this.generateWorld();
+        this.addInput();
         this.createMainPlayer();
     }
 
