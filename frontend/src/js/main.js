@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
 
-import MainMenuScene from './main-menu-scene.js';
-import GameScene from './game-scene.js';
+import LoadingScene from './scenes/loading.js';
+import MainMenuScene from './scenes/main-menu.js';
+import GameScene from './scenes/game.js';
 
 const phaser_config = {
     type: Phaser.WEBGL,
-    scene: [MainMenuScene, GameScene],
+    scene: [LoadingScene, MainMenuScene, GameScene],
     // parent: 'gameContainer',
     scale: {
         mode: Phaser.Scale.RESIZE,  // Adjust to RESIZE to have the canvas resize dynamically

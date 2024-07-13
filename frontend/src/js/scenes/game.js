@@ -6,11 +6,10 @@ export default class GameScene extends Phaser.Scene {
     }
     
     preload() {
-        this.load.image('logo', new URL('../assets/images/wolf.png', import.meta.url).toString());
     }
 
     create() {
-        const logo = this.add.image(400, 800, 'logo')
+        const logo = this.add.image(400, 800, 'wolf')
         logo.displayWidth = 500;
         logo.displayHeight = 500;
         this.tweens.add({
