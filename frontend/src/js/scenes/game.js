@@ -4,6 +4,7 @@ import GrassGenerator from '../utils/grass-generator';
 
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 2000;
+const MOBILE_ZOOM_SCALE = 0.7;
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -21,10 +22,10 @@ export default class GameScene extends Phaser.Scene {
 
     create() {
         this.setBounds();
-        this.setUpCamera();
-        this.createMainPlayer();
         this.createGameUI();
+        this.createMainPlayer();
         this.generateWorld();
+        this.setUpCamera();
         this.addInput();
     }
 
@@ -35,7 +36,10 @@ export default class GameScene extends Phaser.Scene {
     setUpCamera() {
         // Make the camera zoom out more on mobile
         if (this.isMobile) {
-            this.cameras.main.setZoom(0.7);
+            this.cameras.main.setZoom(MOBILE_ZOOM_SCALE);
+            let UIGameScene = this.scene.get('UIGameScene');
+            // @ts-ignore
+            UIGameScene.uiCamera.setZoom(MOBILE_ZOOM_SCALE)
         }
     }
 
@@ -130,6 +134,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     updatePlayer() {
+        this.handlePlayerMovement();
+    }
+
+    handlePlayerMovement() {
         if (!this.player) {
             throw new Error("no player");
         }
@@ -139,6 +147,18 @@ export default class GameScene extends Phaser.Scene {
             this.handleJoyStickInput();
         } else {
             this.calculateKeyboardMovement();
+        }
+        const velocity = this.player.body?.velocity.length();
+
+        if (velocity !== 0) {
+            if (!this.movementSound || !this.movementSound.isPlaying) {
+                this.movementSound = this.sound.add("grass-move", {loop : true});
+                this.movementSound.play({volume:0.5});
+            }
+        } else {
+            if (this.movementSound && this.movementSound.isPlaying) {
+                this.movementSound.pause();
+            }
         }
     }
 

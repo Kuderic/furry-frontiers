@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import GameScene from "./game";
 
 // This scene is always active and overlayed over the game s cene
 export default class GameUIScene extends Phaser.Scene {
@@ -7,10 +8,15 @@ export default class GameUIScene extends Phaser.Scene {
     }
 
     preload() {
+        this.minimapWidth = 200;
+        this.minimapHeight = 200;
+        this.minimapZoomScale = 0.1;
     }
 
     create() {
-        this.gameScene = this.scene.get('GameScene');
+        // Use JSDoc type assertion to tell TypeScript that this.scene.get('GameScene') returns a GameScene object
+        // so it stops bitching
+        this.gameScene = /** @type {GameScene} */ (this.scene.get('GameScene'));
 
         // Create a UI camera
         // @ts-ignore
@@ -21,12 +27,12 @@ export default class GameUIScene extends Phaser.Scene {
 
         // FPS Counter
         // @ts-ignore
-        this.fpsText = this.add.bitmapText(width - 150, 25, 'rainyhearts', '', 36);
+        this.fpsText = this.add.bitmapText(25, 25, 'rainyhearts', '', 36);
         this.fpsText.setTint(0xffffff);
 
-        this.muteButton = this.add.image(50, 50, 'mute')
+        this.muteButton = this.add.image(25, 70, 'mute')
         this.muteButton.setInteractive({ useHandCursor: true });
-        this.muteButton.setDisplaySize(50,50);;
+        this.muteButton.setDisplaySize(50,50);
 
         this.muteButton.on('pointerup', () => {
             this.toggleSound();
@@ -44,19 +50,43 @@ export default class GameUIScene extends Phaser.Scene {
 
         // Add resize event listener
         window.addEventListener('resize', this.resizeUI.bind(this));
+        
+        this.createMinimapCamera();
+    }
+
+    createMinimapCamera() {
+        if (!this.gameScene || !this.gameScene.cameras) {
+            throw new Error("Main game scene or its cameras are not available.")
+        }
+        const canvasWidth = this.game.canvas.width;
+        const canvasHeight = this.game.canvas.height;
+
+        // VERY IMPORTANT: ADD CAMERA TO THE GAME SCENE, NOT THIS SCENE
+        this.minimapCamera = this.gameScene.cameras.add(
+            canvasWidth - this.minimapWidth - 10, // x position (10px padding from right)
+            10,                        // y position (10px padding from top)
+            this.minimapWidth,
+            this.minimapHeight
+        );
+        this.minimapCamera.setZoom(this.minimapZoomScale);
+        this.minimapCamera.setBackgroundColor(0x002244);
+        
+        if (this.gameScene.player) {
+            this.minimapCamera.startFollow(this.gameScene.player, true);
+        } else {
+            console.error("Player is not available in the GameScene.");
+        }
     }
     
     resizeUI() {
-        if (!this.uiCamera || !this.fpsText || !this.muteButton) {
-            return;
-        }
-        const width = this.game.canvas.width;
-        const height = this.game.canvas.height;
-        this.uiCamera.setSize(width, height);
+        const canvasWidth = this.game.canvas.width;
+        const canvasHeight = this.game.canvas.height;
+        this.uiCamera?.setSize(canvasWidth, canvasHeight);
 
         // Reposition and resize UI elements as needed
-        this.fpsText.setPosition(width - 150, 25);
-        this.muteButton.setPosition(50, 50);
+        this.fpsText?.setPosition(25, 25);
+        this.muteButton?.setPosition(50, 50);
+        this.minimapCamera?.setViewport(canvasWidth - this.minimapWidth - 10, 10, this.minimapWidth, this.minimapHeight);
     }
 
     update() {
