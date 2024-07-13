@@ -6,34 +6,32 @@ For online mode, the server is developed to be hosted on an AWS EC2 virtual mach
 
 ## Online Server Hosting
 
-You can either use Docker or simply run uvicorn locally.
-
-1. Running in a Docker container:
-
-Build docker container
+1. Build a Docker container:
 
 ```
 docker build -t furry-frontiers .
 ```
 
-Then use this command
-
-```bash
-./run_server.sh
-```
-
-2. Running without docker:
-
-First install all python dependencies.
+2. Install the local python dependencies.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Then run the server
+3. Start nginx
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+sudo systemctl restart nginx
+```
+
+You will have to mess around with your nginx config to make sure it works with your DNS properly.
+The config can usually be found at `sudo nano /etc/nginx/nginx.conf`. I recommend adding 
+`include /etc/nginx/mime.types;` to your config file.
+
+4. Run the server
+
+```bash
+./run_server.sh
 ```
 
 

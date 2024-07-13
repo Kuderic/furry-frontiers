@@ -20,12 +20,6 @@ This will build a compact version of the client and put it in the `..backend/sta
 If you are changing client files and want them to automatically rebuild, you can use Nodemon
 
 ```
-npm install --save-dev nodemon
-```
-
-And then start nodemon using
-
-```
     npm run watch
 ```
 
