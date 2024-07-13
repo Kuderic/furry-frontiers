@@ -27,10 +27,10 @@ export default class GameUIScene extends Phaser.Scene {
 
         // FPS Counter
         // @ts-ignore
-        this.fpsText = this.add.bitmapText(25, 25, 'rainyhearts', '', 36);
+        this.fpsText = this.add.bitmapText(0, 0, 'rainyhearts', '', 36);
         this.fpsText.setTint(0xffffff);
 
-        this.muteButton = this.add.image(25, 70, 'mute')
+        this.muteButton = this.add.image(50, 50, 'mute')
         this.muteButton.setInteractive({ useHandCursor: true });
         this.muteButton.setDisplaySize(50,50);
 

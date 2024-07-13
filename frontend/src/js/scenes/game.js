@@ -17,16 +17,17 @@ export default class GameScene extends Phaser.Scene {
         }
         this.cameras.main.setBackgroundColor('#457237');
         this.isMobile = this.registry.get('isMobile');
-        // this.isMobile = true;
+        this.isMobile = true;
     }
 
     create() {
         this.setBounds();
-        this.createGameUI();
         this.createMainPlayer();
         this.generateWorld();
+        this.createGameUI();
         this.setUpCamera();
         this.addInput();
+
     }
 
     update() {
@@ -37,9 +38,6 @@ export default class GameScene extends Phaser.Scene {
         // Make the camera zoom out more on mobile
         if (this.isMobile) {
             this.cameras.main.setZoom(MOBILE_ZOOM_SCALE);
-            let UIGameScene = this.scene.get('UIGameScene');
-            // @ts-ignore
-            UIGameScene.uiCamera.setZoom(MOBILE_ZOOM_SCALE)
         }
     }
 
@@ -89,28 +87,29 @@ export default class GameScene extends Phaser.Scene {
         if (!rexPlugin) {
             throw new Error("no rex pluging loaded");
         }
+        const GameUIScene = this.scene.get('GameUIScene');
 
-        this.movementJoyStick = rexPlugin.add(this.scene, {
+        this.movementJoyStick = rexPlugin.add(GameUIScene, {
             x: 100,
-            y: this.cameras.main.height - 125,
+            y: GameUIScene.cameras.main.height - 125,
             radius: 40,
             forceMin: 0,
-            base: this.add.circle(0, 0, 40, 0x888888).setDepth(100).setAlpha(0.25),
-            thumb: this.add.image(0, 0, 'joystick').setDisplaySize(60, 60).setDepth(100).setAlpha(0.5),
+            base: GameUIScene.add.circle(0, 0, 40, 0x888888).setDepth(100).setAlpha(0.25),
+            thumb: GameUIScene.add.image(0, 0, 'joystick').setDisplaySize(60, 60).setDepth(100).setAlpha(0.5),
         }).on('update', () => {}, this)
         
-        this.shootJoyStick = rexPlugin.add(this.scene, {
-            x: this.cameras.main.width - 100,
-            y: this.cameras.main.height - 125,
+        this.shootJoyStick = rexPlugin.add(GameUIScene, {
+            x: GameUIScene.cameras.main.width - 100,
+            y: GameUIScene.cameras.main.height - 125,
             radius: 20,
             forceMin: 0,
-            base: this.add.circle(0, 0, 40, 0x888888, 0.5).setDepth(100).setAlpha(0.25),
-            thumb: this.add.image(0, 0, 'joystick').setDisplaySize(60, 60).setDepth(100).setAlpha(0.5),
+            base: GameUIScene.add.circle(0, 0, 40, 0x888888, 0.5).setDepth(100).setAlpha(0.25),
+            thumb: GameUIScene.add.image(0, 0, 'joystick').setDisplaySize(60, 60).setDepth(100).setAlpha(0.5),
         }).on('update', () => {}, this)
 
         // Move joysticks dynamically based on pointer-down
         this.input.on('pointerdown', (pointer) => {
-            if (pointer.x <= this.cameras.main.width * 0.4) {
+            if (pointer.x <= this.cameras.main.width * 0.6) {
               this.movementJoyStick.base.setPosition(pointer.x, pointer.y).setAlpha(0.5)
               this.movementJoyStick.thumb.setPosition(pointer.x, pointer.y).setAlpha(1)
             }
