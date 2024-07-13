@@ -3,4 +3,6 @@ node_modules
 .venv
 __pycache__/
 .parcel-cache
-static
+backend/static
+stataic
+backend/static/index.html
