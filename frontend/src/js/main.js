@@ -1,35 +1,11 @@
-/// <reference types="phaser" />
 import Phaser from 'phaser';
 
-class GameScene extends Phaser.Scene {
-    constructor() {
-        super({ key: 'GameScene' });
-    }
-    
-    preload() {
-        this.load.image('logo', new URL('../assets/images/wolf.png', import.meta.url).toString());
-    }
-
-    create() {
-        const logo = this.add.image(400, 800, 'logo')
-        logo.displayWidth = 500;
-        logo.displayHeight = 500;
-        this.tweens.add({
-            targets: logo,
-            y: 400,
-            duration: 2000,
-            ease: 'Power2',
-            yoyo: true,
-            loop: -1
-        });
-    }
-
-    update() {
-    }
-}
+import MainMenuScene from './main-menu-scene.js';
+import GameScene from './game-scene.js';
 
 const phaser_config = {
-    type: Phaser.AUTO,
+    type: Phaser.WEBGL,
+    scene: [MainMenuScene, GameScene],
     // parent: 'gameContainer',
     scale: {
         mode: Phaser.Scale.RESIZE,  // Adjust to RESIZE to have the canvas resize dynamically
@@ -51,8 +27,10 @@ const phaser_config = {
         deltaHistory: 5,
         panicMax: 120
     },
-    transparent: true,
-    scene: [GameScene]
-};
+    transparent: true
+}
 
 const game = new Phaser.Game(phaser_config);
+
+// Log the renderer type
+console.log(`Renderer used: ${game.renderer.type === Phaser.WEBGL ? 'WebGL' : 'Canvas'}`);
