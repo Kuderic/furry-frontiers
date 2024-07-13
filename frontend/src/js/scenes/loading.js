@@ -9,6 +9,10 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image("bunny2", new URL(`../../assets/images/bunny2.png`, import.meta.url).toString());
         this.load.image("bunny3", new URL(`../../assets/images/bunny3.png`, import.meta.url).toString());
         this.load.image("wolf", new URL(`../../assets/images/wolf.png`, import.meta.url).toString());
+        this.load.image("joy", new URL(`../../assets/images/wolf.png`, import.meta.url).toString());
+        this.load.image("joystick", new URL(`../../assets/images/joystick.png`, import.meta.url).toString());
+        this.load.image("mute", new URL(`../../assets/images/mute.png`, import.meta.url).toString());
+        this.load.image("unmute", new URL(`../../assets/images/unmute.png`, import.meta.url).toString());
 
         this.load.image("grass1", new URL(`../../assets/images/grass1.png`, import.meta.url).toString());
 
@@ -24,6 +28,9 @@ export default class LoadingScene extends Phaser.Scene {
             new URL('../../assets/fonts/rainyhearts-white_0.png', import.meta.url).toString(),
             new URL('../../assets/fonts/rainyhearts-white.fnt', import.meta.url).toString()
         );
+
+        this.load.plugin('rexvirtualjoystickplugin',
+            'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);
     }
 
 

@@ -22,21 +22,5 @@ export default class Player extends Character {
      */
     preUpdate(time, delta) {
         super.preUpdate(time, delta);
-        this.setVelocity(0, 0);
-
-        if (this.scene.input.keyboard) {
-            if (this.scene.keys.left.isDown) {
-                this.setVelocityX(-1 * this.speed);
-            }
-            if (this.scene.keys.right.isDown) {
-                this.setVelocityX(this.speed);
-            }
-            if (this.scene.keys.up.isDown) {
-                this.setVelocityY(-1 * this.speed);
-            }
-            if (this.scene.keys.down.isDown) {
-                this.setVelocityY(this.speed);
-            }
-        }
     }
 }
