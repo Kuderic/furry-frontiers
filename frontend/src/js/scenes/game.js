@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../utils/player';
 import GrassGenerator from '../utils/grass-generator';
+// import rexvirtualjoystickplugin from './plugins/rexvirtualjoystickplugin.min.js';
 
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 3000;
