@@ -36,21 +36,27 @@ class ConnectionManager:
         return client_id
 
     async def disconnect(self, client_id: str):
-        websocket = self.connected_clients[client_id]
+        print(f"DISCONNECTING PLAYER {client_id}")
+        websocket = self.connected_clients.get(client_id)
+
+        if websocket:
+            try:
+                await websocket.close()
+            except Exception as e:
+                print(f"Error closing WebSocket for client {client_id}: {e}")
+
         del self.connected_clients[client_id]
         del self.player_list[client_id]
-        await websocket.close()
         await self.broadcast_disconnect(client_id)
         self.print_ips()
 
     async def send_message(self, client_id: str, message: dict):
-        """
-        Send a message to one client. message should be a dict (JSON obj)
-        """
-        message_str = json.dumps(message)
-        print("Sending message:", message_str)
-        websocket = self.connected_clients[client_id]
-        await websocket.send_text(message_str)
+        websocket = self.connected_clients.get(client_id)
+        if websocket:
+            try:
+                await websocket.send_text(json.dumps(message))
+            except Exception as e:
+                print(f"Error sending message to client {client_id}: {e}")
 
     async def broadcast_message(self, message: dict):
         """
@@ -87,7 +93,7 @@ class ConnectionManager:
     async def handle_message(self, client_id: str, message: Dict[str, any]):
         handlers = {
             "new_main_player": self.handle_new_main_player,
-            "player_move": self.handle_player_move,
+            "move_player": self.handle_move_player,
             "chat_message": self.handle_chat_message,
         }
         handler = handlers.get(message["type"])
@@ -96,11 +102,13 @@ class ConnectionManager:
         else:
             print(f"Unknown message type: {message['type']}")
     
-    async def handle_new_main_player(self, client_id: str, message: Dict[str, any]):
+    async def handle_new_main_player(self, client_id: str, data: Dict[str, any]):
         player = {
-            'x': 500,
-            'y': 500,
-            'name': message['name']
+            'x': 100,
+            'y': 100,
+            'velocity_x': 0,
+            'velocity_y': 0,
+            'name': data['name']
         }
         self.player_list[client_id] = player
         out_message = {
@@ -111,10 +119,25 @@ class ConnectionManager:
         await self.send_message(client_id, out_message)
         await self.broadcast_player_data()
     
-    async def handle_player_move(self, client_id: str, message: Dict[str, any]):
-        pass
+    async def handle_move_player(self, client_id: str, data: Dict[str, any]):
+        if client_id not in self.player_list:
+            print("wtf player not found")
+            return
+        player = self.player_list.get(client_id, {})
+        player['x'] = data.get('x', player.get('x', 0))
+        player['y'] = data.get('y', player.get('y', 0))
+        player['velocity_x'] = data.get('velocity_x', player.get('velocity_x', 0))
+        player['velocity_y'] = data.get('velocity_y', player.get('velocity_y', 0))
+        self.player_list[client_id] = player
+
+        out_message = {
+            "type": "new_main_player",
+            "client_id": client_id,
+            "player": player
+        }
+        await self.broadcast_message(out_message)
     
-    async def handle_chat_message(self, client_id: str, message: Dict[str, any]):
+    async def handle_chat_message(self, client_id: str, data: Dict[str, any]):
         pass
     
 

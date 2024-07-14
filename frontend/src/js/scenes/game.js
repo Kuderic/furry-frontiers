@@ -6,10 +6,13 @@ import NetworkManager from '../utils/network-manager';
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 2000;
 const MOBILE_ZOOM_SCALE = 0.7;
+const THROTTLE_INTERVAL = 100;
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
+        this.players = {};
+        this.lastSentTime = 0;
     }
     
     preload() {
@@ -21,7 +24,6 @@ export default class GameScene extends Phaser.Scene {
         }
         this.cameras.main.setBackgroundColor('#457237');
         this.isMobile = this.registry.get('isMobile');
-        this.players = {};
         // this.isMobile = true;
 
         await this.createNetworkManager();
@@ -52,6 +54,16 @@ export default class GameScene extends Phaser.Scene {
         console.log("Sending new player message");
         this.networkManager?.sendMessage('new_main_player', {
             name: this.registry.get('playerName')
+        })
+    }
+
+    sendMovePlayerMessage() {
+        console.log('sending move message');
+        this.networkManager?.sendMessage('move_player', {
+            x: this.player?.x,
+            y: this.player?.y,
+            velocity_x: this.player?.body?.velocity.x,
+            velocity_y: this.player?.body?.velocity.y,
         })
     }
 
@@ -179,6 +191,7 @@ export default class GameScene extends Phaser.Scene {
         }
 
         const velocity = this.player.body?.velocity.length();
+
         if (velocity !== 0) {
             if (!this.movementSound || !this.movementSound.isPlaying) {
                 this.movementSound = this.sound.add("grass-move", {loop : true});
@@ -187,6 +200,14 @@ export default class GameScene extends Phaser.Scene {
         } else {
             if (this.movementSound && this.movementSound.isPlaying) {
                 this.movementSound.pause();
+            }
+        }
+
+        if (velocity !== 0) {
+            const currentTime = Date.now();
+            if (currentTime - this.lastSentTime > THROTTLE_INTERVAL) {
+                this.lastSentTime = currentTime;
+                this.sendMovePlayerMessage();
             }
         }
     }
@@ -262,23 +283,23 @@ export default class GameScene extends Phaser.Scene {
         // data.players is a dict with key:value where key is playerId and value is player data. 
         for (const playerId in data.players) {
             console.log(playerId);
-            if (data.players.hasOwnProperty(playerId)) {
-                const playerData = data.players[playerId];
-                console.log(playerData);
+            const playerData = data.players[playerId];
+            console.log(playerData);
 
-                // Check if the player already exists
-                if (this.players[playerId]) {
-                    // Update the existing player's position and other properties
-                    const player = this.players[playerId];
-                    player.x = playerData.x;
-                    player.y = playerData.y;
-                    player.setPosition(playerData.x, playerData.y);
-                    // Update other player properties as needed
-                } else {
-                    // If the player does not exist, create a new player
-                    const newPlayer = new Player(this, playerData.x, playerData.y, 'bunny1', playerData.name);
-                    this.players[playerId] = newPlayer;
-                }
+            // Check if the player already exists
+            if (this.players[playerId]) {
+                console.log(`UPDATING PLAYER ${playerData.name}`);
+                // Update the existing player's position and other properties
+                const player = this.players[playerId];
+                player.x = playerData.x;
+                player.y = playerData.y;
+                player.setPosition(playerData.x, playerData.y);
+                // Update other player properties as needed
+            } else {
+                console.log(`CREATING PLAYER ${playerData.name}`);
+                // If the player does not exist, create a new player
+                const newPlayer = new Player(this, playerData.x, playerData.y, 'bunny1', playerData.name);
+                this.players[playerId] = newPlayer;
             }
         }
     }
