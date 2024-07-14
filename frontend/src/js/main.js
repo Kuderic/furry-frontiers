@@ -6,10 +6,22 @@ import GameScene from './scenes/game.js';
 import CharacterSelectScene from './scenes/character-select.js';
 import GameUIScene from './scenes/game-ui.js';
 
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+
 const phaser_config = {
+    gameTitle: 'Furry Frontiers',
     type: Phaser.WEBGL,
     parent: 'gameContainer',
     scene: [LoadingScene, MainMenuScene, CharacterSelectScene, GameScene, GameUIScene],
+    plugins: {
+        scene: [{
+            key: 'rexUI',
+            plugin: RexUIPlugin,
+            mapping: 'rexUI'
+        },
+        // ...
+        ]
+    },
     scale: {
         mode: Phaser.Scale.RESIZE,  // Adjust to RESIZE to have the canvas resize dynamically
         autoCenter: Phaser.Scale.CENTER_BOTH // Center the game canvas in the parent
@@ -30,6 +42,10 @@ const phaser_config = {
         deltaHistory: 2,
         panicMax: 120
     },
+    antialias: true,
+    fullscreenTarget: 'gameContainer',
+    inputTouch: true,
+    inputTouchCapture: true,
     transparent: true
 }
 

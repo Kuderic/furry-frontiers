@@ -3,6 +3,8 @@ import Player from '../utils/player';
 import GrassGenerator from '../utils/grass-generator';
 import NetworkManager from '../utils/network-manager';
 
+import { ExpBar } from 'phaser3-rex-plugins/templates/ui/ui-components.js';
+
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 2000;
 const MOBILE_ZOOM_SCALE = 0.7;
@@ -32,6 +34,23 @@ export default class GameScene extends Phaser.Scene {
         this.createGameUI();
         this.setUpCamera();
         this.addInput();
+
+
+        var expBar0 = CreateLineExpBar(this)
+            .setPosition(200, 150)
+            .layout()
+            .on('levelup.start', function (level) {
+                console.log('levelup.start', level)
+            })
+            .on('levelup.end', function (level) {
+                console.log('levelup.end', level)
+            })
+            .on('levelup.complete', function () {
+                console.log('levelup.complete')
+            })
+
+        expBar0.gainExp(200)
+        expBar0.exp += 100
     }
 
     update() {
@@ -271,6 +290,7 @@ export default class GameScene extends Phaser.Scene {
      * @param {any} data
      */
     createNewMainPlayerHandler(data) {
+        this.playerId = data.client_id;
         const player = this.createMainPlayer(data.player.x, data.player.y, data.player.name, 'bunny1');
         // @ts-ignore
         this.players[data.client_id] = player;
@@ -282,9 +302,10 @@ export default class GameScene extends Phaser.Scene {
     updatePlayersHandler(data) {
         // data.players is a dict with key:value where key is playerId and value is player data. 
         for (const playerId in data.players) {
-            console.log(playerId);
+            if (playerId === this.playerId) {
+                continue;
+            }
             const playerData = data.players[playerId];
-            console.log(playerData);
 
             // Check if the player already exists
             if (this.players[playerId]) {
@@ -303,4 +324,51 @@ export default class GameScene extends Phaser.Scene {
             }
         }
     }
+}
+const COLOR_PRIMARY = 0x4e342e;
+const COLOR_LIGHT = 0x7b5e57;
+const COLOR_DARK = 0x260e04;
+
+var CreateLineExpBar = function (scene) {
+    return scene.rexUI.add.expBar({
+        width: 250,
+
+        background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
+
+        icon: scene.add.rectangle(0, 0, 20, 20, COLOR_LIGHT),
+        nameText: scene.add.text(0, 0, 'EXP', { fontSize: 24 }),
+        valueText: scene.rexUI.add.BBCodeText(0, 0, '', { fontSize: 24 }),
+        valueTextFormatCallback: function (value, min, max) {
+            value = Math.floor(value);
+            return `[b]${value}[/b]/${max}`;
+        },
+
+        bar: {
+            height: 10,
+            barColor: COLOR_LIGHT,
+            trackColor: COLOR_DARK,
+            // trackStrokeColor: COLOR_LIGHT
+        },
+
+        align: {
+        },
+
+        space: {
+            left: 20, right: 20, top: 20, bottom: 20,
+            icon: 10,
+            bar: -10
+        },
+
+        levelCounter: {
+            table: function (level) {
+                return level * 100;
+            },
+            maxLevel: 10,
+
+            exp: 330,
+        },
+
+        easeDuration: 2000
+
+    })
 }

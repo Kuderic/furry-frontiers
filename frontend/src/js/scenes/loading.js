@@ -28,9 +28,6 @@ export default class LoadingScene extends Phaser.Scene {
             new URL('../../assets/fonts/rainyhearts-white_0.png', import.meta.url).toString(),
             new URL('../../assets/fonts/rainyhearts-white.fnt', import.meta.url).toString()
         );
-
-        this.load.plugin('rexvirtualjoystickplugin',
-            'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);
     }
 
 

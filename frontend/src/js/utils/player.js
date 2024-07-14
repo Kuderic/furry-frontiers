@@ -17,6 +17,9 @@ export default class Player extends Character {
         
         this.speed = 400;
         this.setBounce(0);
+
+        // this.nameTag = 
+        // this.addChild(nameTag)
     }
 
     /**
