@@ -131,9 +131,8 @@ class ConnectionManager:
         self.player_list[client_id] = player
 
         out_message = {
-            "type": "new_main_player",
-            "client_id": client_id,
-            "player": player
+            "type": "update_players",
+            "players": {client_id:player}
         }
         await self.broadcast_message(out_message)
     
