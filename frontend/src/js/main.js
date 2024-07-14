@@ -7,6 +7,7 @@ import CharacterSelectScene from './scenes/character-select.js';
 import GameUIScene from './scenes/game-ui.js';
 
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js';
 
 const phaser_config = {
     gameTitle: 'Furry Frontiers',
@@ -18,9 +19,12 @@ const phaser_config = {
             key: 'rexUI',
             plugin: RexUIPlugin,
             mapping: 'rexUI'
-        },
-        // ...
-        ]
+        }],
+        global: [{
+            key: 'rexVirtualJoystick',
+            plugin: VirtualJoystickPlugin,
+            start: true
+        }]
     },
     scale: {
         mode: Phaser.Scale.RESIZE,  // Adjust to RESIZE to have the canvas resize dynamically

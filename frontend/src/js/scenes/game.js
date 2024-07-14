@@ -3,8 +3,6 @@ import Player from '../utils/player';
 import GrassGenerator from '../utils/grass-generator';
 import NetworkManager from '../utils/network-manager';
 
-import { ExpBar } from 'phaser3-rex-plugins/templates/ui/ui-components.js';
-
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 2000;
 const MOBILE_ZOOM_SCALE = 0.7;
@@ -140,9 +138,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createJoySticks() {
-        const rexPlugin = this.plugins.get('rexvirtualjoystickplugin');
+        const rexPlugin = this.plugins.get('rexVirtualJoystick');
         if (!rexPlugin) {
-            throw new Error("no rex plugin loaded");
+            throw new Error("rexVirtualJoystick plugin not loaded");
         }
         const GameUIScene = this.scene.get('GameUIScene');
 
