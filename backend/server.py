@@ -37,12 +37,10 @@ class ConnectionManager:
 
     async def disconnect(self, client_id: str):
         websocket = self.connected_clients[client_id]
-        await websocket.close()
         del self.connected_clients[client_id]
-
-        await self.broadcast_disconnect(client_id)
         del self.player_list[client_id]
-
+        await websocket.close()
+        await self.broadcast_disconnect(client_id)
         self.print_ips()
 
     async def send_message(self, client_id: str, message: dict):
@@ -60,8 +58,17 @@ class ConnectionManager:
         """
         message_str = json.dumps(message)
         print("Broadcasting message to everyone:", message_str)
-        for websocket in self.connected_clients.values():
-            await websocket.send_text(message_str)
+        disconnected_clients = []
+        for client_id, websocket in self.connected_clients.items():
+            try:
+                await websocket.send_text(message_str)
+            except Exception as e:
+                print(f"Error sending message to client {client_id}: {e}")
+                disconnected_clients.append(client_id)
+        
+        # Remove disconnected clients from the list
+        for client_id in disconnected_clients:
+            await self.disconnect(client_id)
 
     async def broadcast_player_data(self):
         message = {
