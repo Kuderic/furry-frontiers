@@ -30,7 +30,7 @@ export default class GameUIScene extends Phaser.Scene {
         this.fpsText = this.add.bitmapText(0, 0, 'rainyhearts', '', 36);
         this.fpsText.setTint(0xffffff);
 
-        this.muteButton = this.add.image(50, 50, 'mute')
+        this.muteButton = this.add.image(50, 50, 'unmute')
         this.muteButton.setInteractive({ useHandCursor: true });
         this.muteButton.setDisplaySize(50,50);
 
@@ -101,6 +101,6 @@ export default class GameUIScene extends Phaser.Scene {
             throw new Error("no gamescene or mute button");
         }
         this.gameScene.sound.mute = !this.gameScene.sound.mute;
-        this.muteButton.setTexture(this.sound.mute ? 'unmute' : 'mute');
+        this.muteButton.setTexture(this.sound.mute ? 'mute' : 'unmute');
     }
 }

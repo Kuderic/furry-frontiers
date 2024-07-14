@@ -21,6 +21,7 @@ export default class GameScene extends Phaser.Scene {
         }
         this.cameras.main.setBackgroundColor('#457237');
         this.isMobile = this.registry.get('isMobile');
+        this.players = {};
         // this.isMobile = true;
 
         await this.createNetworkManager();
@@ -43,7 +44,7 @@ export default class GameScene extends Phaser.Scene {
         this.sendNewPlayerMessage();
 
         this.networkManager.on('new_main_player', this.createNewMainPlayerHandler.bind(this));
-        // this.networkManager.on('player_data', playerDataHandler.bind(this));
+        this.networkManager.on('update_players', this.updatePlayersHandler.bind(this));
         // this.networkManager.on('player_data', playerDataHandler.bind(this));
     }
 
@@ -249,7 +250,36 @@ export default class GameScene extends Phaser.Scene {
      * @param {any} data
      */
     createNewMainPlayerHandler(data) {
-        console.log(data);
-        this.createMainPlayer(data.player.x, data.player.y, data.player.name, 'bunny1');
+        const player = this.createMainPlayer(data.player.x, data.player.y, data.player.name, 'bunny1');
+        // @ts-ignore
+        this.players[data.client_id] = player;
+    }
+
+    /**
+     * @param {any} data
+     */
+    updatePlayersHandler(data) {
+        // data.players is a dict with key:value where key is playerId and value is player data. 
+        for (const playerId in data.players) {
+            console.log(playerId);
+            if (data.players.hasOwnProperty(playerId)) {
+                const playerData = data.players[playerId];
+                console.log(playerData);
+
+                // Check if the player already exists
+                if (this.players[playerId]) {
+                    // Update the existing player's position and other properties
+                    const player = this.players[playerId];
+                    player.x = playerData.x;
+                    player.y = playerData.y;
+                    player.setPosition(playerData.x, playerData.y);
+                    // Update other player properties as needed
+                } else {
+                    // If the player does not exist, create a new player
+                    const newPlayer = new Player(this, playerData.x, playerData.y, 'bunny1', playerData.name);
+                    this.players[playerId] = newPlayer;
+                }
+            }
+        }
     }
 }

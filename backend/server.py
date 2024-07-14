@@ -38,9 +38,11 @@ class ConnectionManager:
     async def disconnect(self, client_id: str):
         websocket = self.connected_clients[client_id]
         await websocket.close()
-        await self.broadcast_disconnect(client_id)
         del self.connected_clients[client_id]
+
+        await self.broadcast_disconnect(client_id)
         del self.player_list[client_id]
+
         self.print_ips()
 
     async def send_message(self, client_id: str, message: dict):
@@ -64,7 +66,7 @@ class ConnectionManager:
     async def broadcast_player_data(self):
         message = {
             "type": "update_players",
-            "player_data": self.player_list
+            "players": self.player_list
         }
         await self.broadcast_message(message)
 
@@ -100,7 +102,7 @@ class ConnectionManager:
             "player": player
         }
         await self.send_message(client_id, out_message)
-        # await self.broadcast_player_data()
+        await self.broadcast_player_data()
     
     async def handle_player_move(self, client_id: str, message: Dict[str, any]):
         pass
