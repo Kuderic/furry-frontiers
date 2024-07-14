@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Player from '../utils/player';
 import GrassGenerator from '../utils/grass-generator';
+import NetworkManager from '../utils/network-manager';
 
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 2000;
@@ -12,26 +13,45 @@ export default class GameScene extends Phaser.Scene {
     }
     
     preload() {
+    }
+
+    async create() {
         if (this.input.mouse) {
             this.input.mouse.disableContextMenu();
         }
         this.cameras.main.setBackgroundColor('#457237');
         this.isMobile = this.registry.get('isMobile');
         // this.isMobile = true;
-    }
 
-    create() {
+        await this.createNetworkManager();
         this.setBounds();
-        this.createMainPlayer();
         this.generateWorld();
         this.createGameUI();
         this.setUpCamera();
         this.addInput();
-
     }
 
     update() {
         this.updatePlayer();
+    }
+
+    async createNetworkManager() {
+        this.networkManager = new NetworkManager();
+
+        await this.networkManager.connect();
+
+        this.sendNewPlayerMessage();
+
+        this.networkManager.on('new_main_player', this.createNewMainPlayerHandler.bind(this));
+        // this.networkManager.on('player_data', playerDataHandler.bind(this));
+        // this.networkManager.on('player_data', playerDataHandler.bind(this));
+    }
+
+    sendNewPlayerMessage() {
+        console.log("Sending new player message");
+        this.networkManager?.sendMessage('new_main_player', {
+            name: this.registry.get('playerName')
+        })
     }
 
     setUpCamera() {
@@ -52,10 +72,15 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     }
 
-    createMainPlayer() {
-        this.player = new Player(this, 500, 500, "bunny1", this.registry.get('playerName'));
-        this.player.setDisplaySize(150, 150);
-        this.player.setSize(150, 150);
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {string} [name]
+     * @param {string} [texture]
+     */
+    createMainPlayer(x, y, name, texture='bunny1') {
+        console.log(x, y, name, texture='bunny1');
+        this.player = new Player(this, x, y, texture, name);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     }
 
@@ -85,7 +110,7 @@ export default class GameScene extends Phaser.Scene {
     createJoySticks() {
         const rexPlugin = this.plugins.get('rexvirtualjoystickplugin');
         if (!rexPlugin) {
-            throw new Error("no rex pluging loaded");
+            throw new Error("no rex plugin loaded");
         }
         const GameUIScene = this.scene.get('GameUIScene');
 
@@ -108,7 +133,7 @@ export default class GameScene extends Phaser.Scene {
         }).on('update', () => {}, this)
 
         // Move joysticks dynamically based on pointer-down
-        this.input.on('pointerdown', (pointer) => {
+        this.input.on('pointerdown', (/** @type {{ x: number; y: any; }} */ pointer) => {
             if (pointer.x <= this.cameras.main.width * 0.6) {
               this.movementJoyStick.base.setPosition(pointer.x, pointer.y).setAlpha(0.5)
               this.movementJoyStick.thumb.setPosition(pointer.x, pointer.y).setAlpha(1)
@@ -120,7 +145,7 @@ export default class GameScene extends Phaser.Scene {
           })
         
         // Add transparency to joysticks on pointer-up
-        this.input.on('pointerup', (pointer) => {
+        this.input.on('pointerup', (/** @type {any} */ pointer) => {
             if (!this.movementJoyStick.force) {
                 this.movementJoyStick.base.setAlpha(0.25)
                 this.movementJoyStick.thumb.setAlpha(0.5)
@@ -133,6 +158,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     updatePlayer() {
+        if (!this.player) {
+            console.log("Waiting for player to be created");
+            return;
+        }
         this.handlePlayerMovement();
     }
 
@@ -145,10 +174,10 @@ export default class GameScene extends Phaser.Scene {
         if (this.isMobile) {
             this.handleJoyStickInput();
         } else {
-            this.calculateKeyboardMovement();
+            this.handleKeyboardMovement();
         }
-        const velocity = this.player.body?.velocity.length();
 
+        const velocity = this.player.body?.velocity.length();
         if (velocity !== 0) {
             if (!this.movementSound || !this.movementSound.isPlaying) {
                 this.movementSound = this.sound.add("grass-move", {loop : true});
@@ -192,7 +221,7 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
-    calculateKeyboardMovement() {
+    handleKeyboardMovement() {
         if (!this.player) {
             throw new Error("no player");
         }
@@ -210,5 +239,17 @@ export default class GameScene extends Phaser.Scene {
                 this.player.setVelocityY(this.player.speed);
             }
         }
+    }
+
+    ////////////////////////////////////////////////////////////////
+    //                  NETWORK CALLBACK METHODS
+    ////////////////////////////////////////////////////////////////
+
+    /**
+     * @param {any} data
+     */
+    createNewMainPlayerHandler(data) {
+        console.log(data);
+        this.createMainPlayer(data.player.x, data.player.y, data.player.name, 'bunny1');
     }
 }

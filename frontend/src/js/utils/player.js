@@ -12,6 +12,9 @@ export default class Player extends Character {
      */
     constructor(scene, x, y, texture='bunny1', name) {
         super(scene, x, y, texture, name);
+        this.setDisplaySize(150, 150);
+        this.setSize(150, 150);
+        
         this.speed = 400;
         this.setBounce(0);
     }
