@@ -14,10 +14,12 @@ from enum import Enum
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-class MessageType(Enum):
-    RED = 1
-    GREEN = 2
-    BLUE = 3
+# Set up a file handler for connections.log
+file_handler = logging.FileHandler('logs/connections.log')
+file_handler.setLevel(logging.INFO)
+file_formatter = logging.Formatter('%(asctime)s - %(message)s')
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
 
 class ConnectionManager:
     def __init__(self):
@@ -118,6 +120,9 @@ class ConnectionManager:
         }
         await self.send_message(client_id, out_message)
         await self.broadcast_player_data()
+        
+        # Log the new main player to connections.log
+        logger.info(f"New main player connected. Name: {data['name']}")
     
     async def handle_move_player(self, client_id: str, data: Dict[str, any]):
         if client_id not in self.player_list:
