@@ -6,3 +6,4 @@ __pycache__/
 backend/static
 stataic
 backend/static/index.html
+logs
