@@ -10,12 +10,17 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from enum import Enum
 
+server_directory = os.path.dirname(os.path.abspath(__file__))
+print(f"Current working directory: {server_directory}")
+static_directory = os.path.join(server_directory, "static")
+if not os.path.exists(static_directory):
+    raise RuntimeError(f"Directory '{static_directory}' does not exist")
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Set up a file handler for connections.log
-file_handler = logging.FileHandler('logs/connections.log')
+file_handler = logging.FileHandler(os.path.join(server_directory, 'logs/connections.log'))
 file_handler.setLevel(logging.INFO)
 file_formatter = logging.Formatter('%(asctime)s - %(message)s')
 file_handler.setFormatter(file_formatter)
@@ -147,12 +152,6 @@ class ConnectionManager:
 
 app = FastAPI()
 manager = ConnectionManager()
-
-server_directory = os.path.dirname(os.path.abspath(__file__))
-print(f"Current working directory: {server_directory}")
-static_directory = os.path.join(server_directory, "static")
-if not os.path.exists(static_directory):
-    raise RuntimeError(f"Directory '{static_directory}' does not exist")
 
 app.mount("/static", StaticFiles(directory=static_directory), name="static")
 

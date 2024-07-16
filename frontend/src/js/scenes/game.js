@@ -37,10 +37,10 @@ export default class GameScene extends Phaser.Scene {
         var expBar0 = CreateLineExpBar(this)
             .setPosition(200, 150)
             .layout()
-            .on('levelup.start', function (level) {
+            .on('levelup.start', function (/** @type {any} */ level) {
                 console.log('levelup.start', level)
             })
-            .on('levelup.end', function (level) {
+            .on('levelup.end', function (/** @type {any} */ level) {
                 console.log('levelup.end', level)
             })
             .on('levelup.complete', function () {
@@ -64,6 +64,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.networkManager.on('new_main_player', this.createNewMainPlayerHandler.bind(this));
         this.networkManager.on('update_players', this.updatePlayersHandler.bind(this));
+        this.networkManager.on('disconnect_player', this.disconnectPlayerHandler.bind(this));
         // this.networkManager.on('player_data', playerDataHandler.bind(this));
     }
 
@@ -322,12 +323,21 @@ export default class GameScene extends Phaser.Scene {
             }
         }
     }
+    
+    /**
+     * @param {{ client_id: string; }} data
+     */
+    disconnectPlayerHandler(data) {
+        this.players[data.client_id].destroy();
+        delete this.players[data.client_id];
+    }
 }
+
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
-var CreateLineExpBar = function (scene) {
+var CreateLineExpBar = function (/** @type {this} */ scene) {
     return scene.rexUI.add.expBar({
         width: 250,
 
@@ -336,7 +346,7 @@ var CreateLineExpBar = function (scene) {
         icon: scene.add.rectangle(0, 0, 20, 20, COLOR_LIGHT),
         nameText: scene.add.text(0, 0, 'EXP', { fontSize: 24 }),
         valueText: scene.rexUI.add.BBCodeText(0, 0, '', { fontSize: 24 }),
-        valueTextFormatCallback: function (value, min, max) {
+        valueTextFormatCallback: function (/** @type {number} */ value, /** @type {any} */ min, /** @type {any} */ max) {
             value = Math.floor(value);
             return `[b]${value}[/b]/${max}`;
         },
@@ -358,7 +368,7 @@ var CreateLineExpBar = function (scene) {
         },
 
         levelCounter: {
-            table: function (level) {
+            table: function (/** @type {number} */ level) {
                 return level * 100;
             },
             maxLevel: 10,
