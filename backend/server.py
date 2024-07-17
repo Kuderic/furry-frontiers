@@ -142,12 +142,17 @@ class ConnectionManager:
 
         out_message = {
             "type": "update_players",
-            "players": {client_id:player}
+            "players": {client_id: player}
         }
         await self.broadcast_message(out_message)
     
     async def handle_chat_message(self, client_id: str, data: Dict[str, any]):
-        pass
+        out_message = {
+            "type": "chat_message",
+            "client_id": client_id,
+            "message": data.get("message", "Oopsie woopsie no message was found!")
+        }
+        await self.broadcast_message(out_message)
     
 
 app = FastAPI()
