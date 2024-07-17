@@ -9,7 +9,6 @@ export class Character extends Phaser.Physics.Arcade.Sprite {
      * @param {string} name
      */
     constructor(scene, x, y, texture, name) {
-        console.log("new character created")
         super(scene, x, y, texture);
         this.name = name;
 

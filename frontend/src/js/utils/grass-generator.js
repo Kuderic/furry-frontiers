@@ -9,7 +9,7 @@ export default class GrassGenerator {
         this.numGrassTypes = 1;
     }
 
-    generateGrass(density=0.000015) {
+    generateGrass(density=0.000005) {
         const area = this.scene.physics.world.bounds.width * this.scene.physics.world.bounds.height;
         const numGrass = area * density;
         console.log (`randomly placing ${numGrass} patches of grass`);

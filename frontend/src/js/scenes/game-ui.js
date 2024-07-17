@@ -5,12 +5,12 @@ import GameScene from "./game";
 export default class GameUIScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameUIScene'});
-    }
-
-    preload() {
         this.minimapWidth = 200;
         this.minimapHeight = 200;
         this.minimapZoomScale = 0.1;
+    }
+
+    preload() {
     }
 
     create() {
@@ -50,12 +50,25 @@ export default class GameUIScene extends Phaser.Scene {
 
         // Add resize event listener
         window.addEventListener('resize', this.resizeUI.bind(this));
-        
-        this.createMinimapCamera();
+
+        // EXP Bar
+        this.expBar = this.CreateLineExpBar()
+        .setPosition(200, 150)
+        .layout()
+        .on('levelup.start', function (/** @type {any} */ level) {
+            console.log('levelup.start', level)
+        })
+        .on('levelup.end', function (/** @type {any} */ level) {
+            console.log('levelup.end', level)
+        })
+        .on('levelup.complete', function () {
+            console.log('levelup.complete')
+        })
     }
 
     createMinimapCamera() {
-        if (!this.gameScene || !this.gameScene.cameras) {
+        console.log("creating minimap camera");
+        if (!this.gameScene) {
             throw new Error("Main game scene or its cameras are not available.")
         }
         const canvasWidth = this.game.canvas.width;
@@ -76,6 +89,53 @@ export default class GameUIScene extends Phaser.Scene {
         } else {
             console.error("Player is not available in the GameScene.");
         }
+    }
+    CreateLineExpBar() {
+        const COLOR_PRIMARY = 0x9965cc;
+        const COLOR_LIGHT = 0xeeeeee;
+        const COLOR_DARK = 0x260e34;
+
+        return this.rexUI.add.expBar({
+            width: 250,
+    
+            background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
+    
+            icon: this.add.rectangle(0, 0, 20, 20, COLOR_LIGHT),
+            nameText: this.add.bitmapText(0, -30, 'rainyhearts', 'Exp', 24).setTint(0xffffff),
+            valueText: this.rexUI.add.BBCodeText(0, -30, '', { fontSize: 24 }),
+            valueTextFormatCallback: function (/** @type {number} */ value, /** @type {any} */ min, /** @type {any} */ max) {
+                value = Math.floor(value);
+                return `[b]${value}[/b]/${max}`;
+            },
+    
+            bar: {
+                height: 6,
+                barColor: COLOR_LIGHT,
+                trackColor: COLOR_DARK,
+                // trackStrokeColor: COLOR_LIGHT
+            },
+    
+            align: {
+            },
+    
+            space: {
+                left: 20, right: 20, top: 20, bottom: 20,
+                icon: 10,
+                bar: -10
+            },
+    
+            levelCounter: {
+                table: function (/** @type {number} */ level) {
+                    return level * 100;
+                },
+                maxLevel: 10,
+    
+                exp: 330,
+            },
+    
+            easeDuration: 2000
+    
+        })
     }
     
     resizeUI() {

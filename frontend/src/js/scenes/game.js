@@ -3,6 +3,8 @@ import Player from '../utils/player';
 import GrassGenerator from '../utils/grass-generator';
 import NetworkManager from '../utils/network-manager';
 
+import expBar from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 2000;
 const MOBILE_ZOOM_SCALE = 0.7;
@@ -26,29 +28,12 @@ export default class GameScene extends Phaser.Scene {
         this.isMobile = this.registry.get('isMobile');
         // this.isMobile = true;
 
+        this.createGameUI();
         await this.createNetworkManager();
         this.setBounds();
         this.generateWorld();
-        this.createGameUI();
         this.setUpCamera();
-        this.addInput();
-
-
-        var expBar0 = CreateLineExpBar(this)
-            .setPosition(200, 150)
-            .layout()
-            .on('levelup.start', function (/** @type {any} */ level) {
-                console.log('levelup.start', level)
-            })
-            .on('levelup.end', function (/** @type {any} */ level) {
-                console.log('levelup.end', level)
-            })
-            .on('levelup.complete', function () {
-                console.log('levelup.complete')
-            })
-
-        expBar0.gainExp(200)
-        expBar0.exp += 100
+        this.setUpControls();
     }
 
     update() {
@@ -59,8 +44,7 @@ export default class GameScene extends Phaser.Scene {
         this.networkManager = new NetworkManager();
 
         await this.networkManager.connect();
-
-        this.sendNewPlayerMessage();
+        await this.sendNewPlayerMessage();
 
         this.networkManager.on('new_main_player', this.createNewMainPlayerHandler.bind(this));
         this.networkManager.on('update_players', this.updatePlayersHandler.bind(this));
@@ -68,16 +52,15 @@ export default class GameScene extends Phaser.Scene {
         // this.networkManager.on('player_data', playerDataHandler.bind(this));
     }
 
-    sendNewPlayerMessage() {
+    async sendNewPlayerMessage() {
         console.log("Sending new player message");
-        this.networkManager?.sendMessage('new_main_player', {
+        await this.networkManager?.sendMessage('new_main_player', {
             name: this.registry.get('playerName')
         })
     }
 
-    sendMovePlayerMessage() {
-        console.log('sending move message');
-        this.networkManager?.sendMessage('move_player', {
+    async sendMovePlayerMessage() {
+        await this.networkManager?.sendMessage('move_player', {
             x: this.player?.x,
             y: this.player?.y,
             velocity_x: this.player?.body?.velocity.x,
@@ -86,6 +69,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     setUpCamera() {
+        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         // Make the camera zoom out more on mobile
         if (this.isMobile) {
             this.cameras.main.setZoom(MOBILE_ZOOM_SCALE);
@@ -100,7 +84,6 @@ export default class GameScene extends Phaser.Scene {
     setBounds() {
         this.physics.world.bounds.width = WORLD_WIDTH;
         this.physics.world.bounds.height = WORLD_HEIGHT;
-        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     }
 
     /**
@@ -110,17 +93,30 @@ export default class GameScene extends Phaser.Scene {
      * @param {string} [texture]
      */
     createMainPlayer(x, y, name, texture='bunny1') {
-        console.log(x, y, name, texture='bunny1');
         this.player = new Player(this, x, y, texture, name);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+        // @ts-ignore
+        this.uiScene?.createMinimapCamera();
     }
 
-    addKeyboardInput() {
+    addMouseAndKeyboardInput() {
         this.keys = this.input.keyboard?.addKeys({
             'up': Phaser.Input.Keyboard.KeyCodes.W,
             'left': Phaser.Input.Keyboard.KeyCodes.A,
             'down': Phaser.Input.Keyboard.KeyCodes.S,
             'right': Phaser.Input.Keyboard.KeyCodes.D,
+        })
+        this.input.on('pointerdown', (/** @type {{ x: number; y: any; }} */ pointer) => {
+            if (this.input.mousePointer.rightButtonDown()) {
+                console.log("Attacking = true")
+                this.attacking = true;
+            }
+        })
+        this.input.on('pointerup', (/** @type {{ x: number; y: any; }} */ pointer) => {
+            if (this.input.mousePointer.rightButtonReleased()) {
+                console.log("Attacking = false")
+                this.attacking = true;
+            }
         })
     }
 
@@ -130,15 +126,26 @@ export default class GameScene extends Phaser.Scene {
         this.grassGenerator.generateGrass();
     }
 
-    addInput() {
+    setUpControls() {
         if (this.isMobile) {
             this.createJoySticks();
         } else {
-            this.addKeyboardInput();
+            this.addMouseAndKeyboardInput();
         }
     }
 
+    startAttacking() {
+        console.log("start attacking");
+        this.attacking = true;
+    }
+
+    stopAttacking() {
+        console.log("stop attacking");
+        this.attacking = false;
+    }
+
     createJoySticks() {
+        const JOYSTICK_DIVIDER_RATIO = 0.6;
         const rexPlugin = this.plugins.get('rexVirtualJoystick');
         if (!rexPlugin) {
             throw new Error("rexVirtualJoystick plugin not loaded");
@@ -165,13 +172,14 @@ export default class GameScene extends Phaser.Scene {
 
         // Move joysticks dynamically based on pointer-down
         this.input.on('pointerdown', (/** @type {{ x: number; y: any; }} */ pointer) => {
-            if (pointer.x <= this.cameras.main.width * 0.6) {
+            if (pointer.x <= this.cameras.main.width * JOYSTICK_DIVIDER_RATIO) {
               this.movementJoyStick.base.setPosition(pointer.x, pointer.y).setAlpha(0.5)
               this.movementJoyStick.thumb.setPosition(pointer.x, pointer.y).setAlpha(1)
             }
-            if (pointer.x >= this.cameras.main.width * 0.6) {
+            if (pointer.x >= this.cameras.main.width * JOYSTICK_DIVIDER_RATIO) {
               this.shootJoyStick.base.setPosition(pointer.x, pointer.y).setAlpha(0.5)
               this.shootJoyStick.thumb.setPosition(pointer.x, pointer.y).setAlpha(1)
+              this.startAttacking();
             }
           })
         
@@ -182,6 +190,7 @@ export default class GameScene extends Phaser.Scene {
                 this.movementJoyStick.thumb.setAlpha(0.5)
             }
             if (!this.shootJoyStick.force) {
+                this.stopAttacking();
                 this.shootJoyStick.base.setAlpha(0.25)
                 this.shootJoyStick.thumb.setAlpha(0.5)
             }
@@ -331,52 +340,4 @@ export default class GameScene extends Phaser.Scene {
         this.players[data.client_id].destroy();
         delete this.players[data.client_id];
     }
-}
-
-const COLOR_PRIMARY = 0x4e342e;
-const COLOR_LIGHT = 0x7b5e57;
-const COLOR_DARK = 0x260e04;
-
-var CreateLineExpBar = function (/** @type {this} */ scene) {
-    return scene.rexUI.add.expBar({
-        width: 250,
-
-        background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
-
-        icon: scene.add.rectangle(0, 0, 20, 20, COLOR_LIGHT),
-        nameText: scene.add.text(0, 0, 'EXP', { fontSize: 24 }),
-        valueText: scene.rexUI.add.BBCodeText(0, 0, '', { fontSize: 24 }),
-        valueTextFormatCallback: function (/** @type {number} */ value, /** @type {any} */ min, /** @type {any} */ max) {
-            value = Math.floor(value);
-            return `[b]${value}[/b]/${max}`;
-        },
-
-        bar: {
-            height: 10,
-            barColor: COLOR_LIGHT,
-            trackColor: COLOR_DARK,
-            // trackStrokeColor: COLOR_LIGHT
-        },
-
-        align: {
-        },
-
-        space: {
-            left: 20, right: 20, top: 20, bottom: 20,
-            icon: 10,
-            bar: -10
-        },
-
-        levelCounter: {
-            table: function (/** @type {number} */ level) {
-                return level * 100;
-            },
-            maxLevel: 10,
-
-            exp: 330,
-        },
-
-        easeDuration: 2000
-
-    })
 }
