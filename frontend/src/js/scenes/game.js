@@ -323,6 +323,8 @@ export default class GameScene extends Phaser.Scene {
                 player.x = playerData.x;
                 player.y = playerData.y;
                 player.setPosition(playerData.x, playerData.y);
+                player.setVelocityX(playerData.velocity_x);
+                player.setVelocityY(playerData.velocity_y);
                 // Update other player properties as needed
             } else {
                 console.log(`CREATING PLAYER ${playerData.name}`);
