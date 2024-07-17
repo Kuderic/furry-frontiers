@@ -11,7 +11,6 @@ export default class Player extends Character {
      * @param {any} name
      */
     constructor(scene, x, y, texture='bunny1', name) {
-        console.log(name.toLowerCase().includes("wolf"));
         if (name.toLowerCase().includes("wolf")) {
             texture = "wolf";
         }

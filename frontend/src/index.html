@@ -11,7 +11,15 @@
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
 </head>
 <body>
-    <div id="gameContainer"></div>
+    <div id="gameContainer">
+        <div id="chatBox">
+            <ul id="messagesList" tabindex="-1"></ul>
+            <hr>
+            <form onsubmit="return sendChatMessage(event)" autocomplete="off">
+                <input type="text" id="messageInput" placeholder="Type your message here">
+            </form>
+        </div>
+    </div>
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -31,6 +31,7 @@ body {
 }
 
 #chatBox {
+    display: none;
     z-index: 100; /* Ensure it is above the Phaser canvas */
     top: auto;
     right: auto;

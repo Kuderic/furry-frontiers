@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "scripts": {
     "start": "npx parcel serve src/index.html",
-    "build": "npx parcel build src/index.html --dist-dir ../backend/static --no-cache --public-url /static",
-    "watch": "nodemon --watch src --exec \"npm run build\""
+    "build-server": "npx parcel build src/index.html --dist-dir ../backend/static --public-url /static",
+    "build-local": "npx parcel build src/index.html --dist-dir ../backend/static --no-content-hash --no-optimize --public-url /static",
+    "watch-server": "nodemon --watch src --exec \"npm run build-server\"",
+    "watch-local": "nodemon --watch src --exec \"npm run build-local\""
   },
   "author": "",
   "license": "ISC",

@@ -34,10 +34,42 @@ export default class GameScene extends Phaser.Scene {
         this.generateWorld();
         this.setUpCamera();
         this.setUpControls();
+
+        // Attach sendMessage to the window object
+        this.setUpChatBox();
     }
 
     update() {
         this.updatePlayer();
+    }
+
+    setUpChatBox() {
+        this.showChatBox();
+        window.sendChatMessage = this.sendChatMessage.bind(this);
+        // window.stopPropagation = this.stopPropagation;
+
+        const messageInput = document.getElementById('messageInput');
+        if (!messageInput) {
+            console.error("Message Input box not found");
+            return;
+        }
+        messageInput.addEventListener('focus', this.onMessageInputFocus.bind(this));
+        messageInput.addEventListener('blur', this.onMessageInputBlur.bind(this));
+    }
+
+    showChatBox() {
+        let chatBox = document.getElementById('chatBox');
+        if (chatBox) {
+            chatBox.style.display = 'block'
+        }
+    }
+    
+    onMessageInputFocus() {
+        this.input.keyboard?.clearCaptures();
+    }
+
+    onMessageInputBlur() {
+        this.addKeyboardInput();
     }
 
     async createNetworkManager() {
@@ -49,14 +81,31 @@ export default class GameScene extends Phaser.Scene {
         this.networkManager.on('new_main_player', this.createNewMainPlayerHandler.bind(this));
         this.networkManager.on('update_players', this.updatePlayersHandler.bind(this));
         this.networkManager.on('disconnect_player', this.disconnectPlayerHandler.bind(this));
+        this.networkManager.on('chat_message', this.createChatMessageHandler.bind(this));
         // this.networkManager.on('player_data', playerDataHandler.bind(this));
+    }
+
+    async sendChatMessage(event) {
+        event.preventDefault(); // Used to stop form reloading page
+        let messageInput = document.getElementById("messageInput");
+        console.log("Sending chat message");
+        await this.networkManager?.sendMessage(
+            'chat_message',
+            {
+                'message': messageInput.value
+            }
+        )
+        messageInput.value = ''; // Clear the input field after sending the message
     }
 
     async sendNewPlayerMessage() {
         console.log("Sending new player message");
-        await this.networkManager?.sendMessage('new_main_player', {
-            name: this.registry.get('playerName')
-        })
+        await this.networkManager?.sendMessage(
+            'new_main_player',
+            {
+                name: this.registry.get('playerName')
+            }
+        )
     }
 
     async sendMovePlayerMessage() {
@@ -99,13 +148,17 @@ export default class GameScene extends Phaser.Scene {
         this.uiScene?.createMinimapCamera();
     }
 
-    addMouseAndKeyboardInput() {
+    addKeyboardInput() {
         this.keys = this.input.keyboard?.addKeys({
             'up': Phaser.Input.Keyboard.KeyCodes.W,
             'left': Phaser.Input.Keyboard.KeyCodes.A,
             'down': Phaser.Input.Keyboard.KeyCodes.S,
             'right': Phaser.Input.Keyboard.KeyCodes.D,
         })
+    }
+
+    addMouseAndKeyboardInput() {
+        this.addKeyboardInput();
         this.input.on('pointerdown', (/** @type {{ x: number; y: any; }} */ pointer) => {
             if (this.input.mousePointer.rightButtonDown()) {
                 console.log("Attacking = true")
@@ -290,18 +343,73 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
+    
+
+    /**
+     * @param {string | number} playerId
+     * @param {any} message
+     */
+    displayChatMessage(playerId, message) {
+        console.log(playerId,"spoke");
+        // this.players[playerId].say(message);
+
+        let messagesList = document.getElementById("messagesList");
+        let messageItem = document.createElement("li");
+        console.log(this.players);
+        let name = this.players[playerId].name;
+    
+        // Create a timestamp
+        let timestamp = new Date().toLocaleTimeString(); // This gives you a human-readable time format
+    
+        // Include the timestamp in the message text
+        messageItem.textContent = `[${timestamp}] ${name}: ${message}`;
+    
+        // Append the message item to the list
+        messagesList.appendChild(messageItem);
+        messageItem.className = "chatMessage";
+    
+        // Call to remove the message item after a delay (10 seconds)
+        // removeElementAfterDelay(messageItem, 10000);
+        scrollToBottom();
+    }
+
+    /**
+     * @param {any} message
+     */
+    displayServerMessage(message) {
+        let messagesList = document.getElementById("messagesList");
+        let messageItem = document.createElement("li");
+        messageItem.className = "serverMessage";
+        // Create a timestamp
+        let timestamp = new Date().toLocaleTimeString(); // This gives you a human-readable time format
+        // Include the timestamp in the message text
+        messageItem.textContent = `[${timestamp}] ${message}`;
+        // Append the message item to the list
+        messagesList.appendChild(messageItem);
+        scrollToBottom();
+    }
+
     ////////////////////////////////////////////////////////////////
     //                  NETWORK CALLBACK METHODS
     ////////////////////////////////////////////////////////////////
+
+    
+    /**
+     * @param {any} data
+     */
+    createChatMessageHandler(data) {
+        const player = this.displayChatMessage(data.client_id, data.message);
+    }
+
 
     /**
      * @param {any} data
      */
     createNewMainPlayerHandler(data) {
         this.playerId = data.client_id;
-        const player = this.createMainPlayer(data.player.x, data.player.y, data.player.name, 'bunny1');
+        this.createMainPlayer(data.player.x, data.player.y, data.player.name, 'bunny1');
+        this.players[data.client_id] = this.player;
         // @ts-ignore
-        this.players[data.client_id] = player;
     }
 
     /**
@@ -342,4 +450,19 @@ export default class GameScene extends Phaser.Scene {
         this.players[data.client_id].destroy();
         delete this.players[data.client_id];
     }
+}
+
+document.getElementById('messageInput').addEventListener('click', function(event) {
+    event.stopPropagation();
+});
+
+document.getElementById('chatBox').addEventListener('wheel', function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    document.getElementById('messagesList').scrollTop += event.deltaY;
+});
+
+function scrollToBottom() {
+    const messagesList = document.getElementById('messagesList');
+    messagesList.scrollTop = messagesList.scrollHeight;
 }
