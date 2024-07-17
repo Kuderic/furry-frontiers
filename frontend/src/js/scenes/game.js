@@ -15,6 +15,7 @@ export default class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.players = {};
         this.lastSentTime = 0;
+        this.lastSentVelocity = {x:0, y:0};
     }
     
     preload() {
@@ -283,11 +284,16 @@ export default class GameScene extends Phaser.Scene {
             }
         }
 
-        if (velocity !== 0) {
-            const currentTime = Date.now();
-            if (currentTime - this.lastSentTime > THROTTLE_INTERVAL) {
-                this.lastSentTime = currentTime;
+        const currentTime = Date.now();
+        if (currentTime - this.lastSentTime > THROTTLE_INTERVAL) {
+            if (this.lastSentVelocity.x != this.player.body?.velocity.x ||
+                this.lastSentVelocity.y != this.player.body?.velocity.x)
+            {
+                console.log("They are not equal.");
                 this.sendMovePlayerMessage();
+                this.lastSentTime = currentTime;
+                this.lastSentVelocity.x = this.player.body?.velocity.x;
+                this.lastSentVelocity.y = this.player.body?.velocity.y;
             }
         }
     }

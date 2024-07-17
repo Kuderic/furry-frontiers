@@ -51,19 +51,21 @@ export default class GameUIScene extends Phaser.Scene {
         // Add resize event listener
         window.addEventListener('resize', this.resizeUI.bind(this));
 
-        // EXP Bar
-        this.expBar = this.CreateLineExpBar()
-        .setPosition(200, 150)
-        .layout()
-        .on('levelup.start', function (/** @type {any} */ level) {
-            console.log('levelup.start', level)
-        })
-        .on('levelup.end', function (/** @type {any} */ level) {
-            console.log('levelup.end', level)
-        })
-        .on('levelup.complete', function () {
-            console.log('levelup.complete')
-        })
+        if (!this.registry.get('isMobile')) {
+            // EXP Bar
+            this.expBar = this.CreateLineExpBar()
+            .setPosition(200, 150)
+            .layout()
+            .on('levelup.start', function (/** @type {any} */ level) {
+                console.log('levelup.start', level)
+            })
+            .on('levelup.end', function (/** @type {any} */ level) {
+                console.log('levelup.end', level)
+            })
+            .on('levelup.complete', function () {
+                console.log('levelup.complete')
+            })
+        }
     }
 
     createMinimapCamera() {
