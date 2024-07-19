@@ -7,7 +7,7 @@ const WORLD_WIDTH = 4000;
 const WORLD_HEIGHT = 3000;
 const MOBILE_ZOOM_SCALE = 0.7;
 const THROTTLE_INTERVAL = 100;
-const MINIMUM_FORCE_ATTACK_JOYSTICK = 20;
+const MINIMUM_FORCE_ATTACK_JOYSTICK = 40;
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
