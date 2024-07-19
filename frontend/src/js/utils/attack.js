@@ -1,23 +1,32 @@
 import Phaser from 'phaser';
+import Character from './character';
 
 export default class Attack extends Phaser.Physics.Arcade.Sprite {
     /**
      * @param {Phaser.Scene} scene
-     * @param {number} x
-     * @param {number} y
+     * @param {Character} character
      * @param {Object} config - Configuration object
-     * @param {string} config.type - Type of attack
-     * @param {number} config.damage - Damage value of the attack
-     * @param {number} config.duration - Duration of the attack animation
-     * @param {Object} config.tween - Tween configuration for the attack animation
+     * @param {string} [config.type] - Type of attack
+     * @param {number} [config.direction] - Direction of the attack
+     * @param {boolean} [config.follow] - Whether the attack should follow the player
+     * @param {number} [config.damage] - Damage value of the attack
+     * @param {number} [config.duration] - Duration of the attack animation
+     * @param {Object} [config.tween] - Tween configuration for the attack animation
      */
-    constructor(scene, x, y, texture='melee', config) {
-        super(scene, x, y, texture);
-        
+    constructor(scene, character, texture='melee', config = {}) {
+        super(scene, 0, 0, texture);
+
+        this.character = character;
         this.type = config.type || 'default';
+        this.follow = config.follow || false;
+        this.direction = config.direction || 0;
         this.damage = config.damage || 10;
-        this.duration = config.duration || 1000;
-        this.tweenConfig = config.tween || {};
+        this.duration = config.duration || 500;
+        this.tweenConfig = config.tween || null;
+
+        this.offset = this.calculateOffset();
+        this.setPosition(character.x + this.offset.x, character.y + this.offset.y, 3);
+        this.setRotation(this.direction);
 
         // Add to the scene
         scene.add.existing(this);
@@ -32,6 +41,30 @@ export default class Attack extends Phaser.Physics.Arcade.Sprite {
 
         // // Listen for collision with enemies
         // this.setupCollision(scene);
+        
+        // Timed callback to destroy this
+        this.scene.time.delayedCall(this.duration, () => {
+            this.destroy();
+        });
+    }
+
+    /**
+     * @param {number} time The current timestamp.
+     * @param {number} delta The delta time, in ms, elapsed since the last frame.
+     */
+    preUpdate(time, delta) {
+        super.preUpdate(time, delta);
+        if (this.follow) {
+            this.setPosition(this.character.x + this.offset.x, this.character.y + this.offset.y);
+        }
+    }
+
+    calculateOffset() {
+        // Calculate offset from parent
+        const x = -1 * Math.cos(this.direction) * (this.character.displayWidth / 2 + 15);
+        const y = -1 * Math.sin(this.direction) * (this.character.displayHeight / 2 + 15);
+        console.log(x, y);
+        return {x, y};
     }
 
     setupAnimation() {
@@ -54,10 +87,7 @@ export default class Attack extends Phaser.Physics.Arcade.Sprite {
             this.scene.tweens.add({
                 targets: this,
                 ...this.tweenConfig,
-                duration: this.duration,
-                onComplete: () => {
-                    this.destroy(); // Destroy the attack object after the animation completes
-                }
+                duration: this.duration
             });
         }
     }

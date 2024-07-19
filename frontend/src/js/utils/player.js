@@ -59,28 +59,22 @@ export default class Player extends Character {
         this.nameTag.destroy();
     }
 
-    startNewAttack(direction=0) {
+    startNewAttack(direction = 0) {
         if (this.attacking == true) {
             return;
         }
-        this.attacking = true
         console.log(`${this.name} starting new attack`);
 
-        const attackDuration = 500; // duration in ms
-        let attackX = this.x + 30;
-        let attackY = this.y + 30;
+        this.attacking = true
+        const attackDuration = 400; // duration in ms
         
         // Create a new Attack instance
-        this.attackSprite = new Attack(this.scene, attackX, attackY, 'melee', {
+        this.attackSprite = new Attack(this.scene, this, 'melee', {
             type: 'slash',
+            direction: direction,
+            follow: true,
             damage: 10,
-            duration: attackDuration,
-            tween: {
-                x: attackX,
-                y: attackY,
-                alpha: 0.5, // fade out
-                ease: 'Power1',
-            }
+            duration: attackDuration
         });
 
         // Timed callback to reset this.attacking to false

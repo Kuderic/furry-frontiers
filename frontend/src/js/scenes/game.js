@@ -325,9 +325,21 @@ export default class GameScene extends Phaser.Scene {
 
         if (this.attacking) {
             if (!this.player.attacking) {
-                this.player.startNewAttack();
+                const direction = this.getDirectionToMouse();
+                // console.log("direction:", direction);
+                this.player.startNewAttack(direction);
             }
         }
+    }
+
+    getDirectionToMouse() {
+        if (!this.player) {
+            console.error("no main player lol");
+            return;
+        }
+        const mouseX = this.input.mousePointer.worldX;
+        const mouseY = this.input.mousePointer.worldY;
+        return Phaser.Math.Angle.Between(mouseX, mouseY, this.player.x, this.player.y);
     }
 
     handlePlayerMovement() {
