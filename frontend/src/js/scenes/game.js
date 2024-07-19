@@ -173,6 +173,7 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         // @ts-ignore
         this.uiScene?.createMinimapCamera();
+        this.displayServerMessage(`${this.player.name} has connected to the game.`);
     }
 
     addKeyboardInput() {
@@ -500,6 +501,7 @@ export default class GameScene extends Phaser.Scene {
                 console.log(`CREATING PLAYER ${playerData.name}`);
                 // If the player does not exist, create a new player
                 const newPlayer = new Player(this, playerData.x, playerData.y, 'bunny1', playerData.name);
+                this.displayServerMessage(`${playerData.name} has connected to the game.`);
                 this.players[playerId] = newPlayer;
             }
         }
@@ -509,6 +511,7 @@ export default class GameScene extends Phaser.Scene {
      * @param {{ client_id: string; }} data
      */
     disconnectPlayerHandler(data) {
+        this.displayServerMessage(`${this.players[data.client_id].name} has disconnected.`);
         this.players[data.client_id].destroy();
         delete this.players[data.client_id];
     }

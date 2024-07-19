@@ -57,6 +57,18 @@ class ConnectionManager:
         await self.broadcast_disconnect(client_id)
         self.print_ips()
 
+    async def handle_message(self, client_id: str, message: Dict[str, any]):
+        handlers = {
+            "new_main_player": self.handle_new_main_player,
+            "move_player": self.handle_move_player,
+            "chat_message": self.handle_chat_message,
+        }
+        handler = handlers.get(message["type"])
+        if handler:
+            await handler(client_id, message['data'])
+        else:
+            print(f"Unknown message type: {message['type']}")
+    
     async def send_message(self, client_id: str, message: dict):
         websocket = self.connected_clients.get(client_id)
         if websocket:
@@ -96,18 +108,6 @@ class ConnectionManager:
             "client_id": client_id
         }
         await self.broadcast_message(message)
-
-    async def handle_message(self, client_id: str, message: Dict[str, any]):
-        handlers = {
-            "new_main_player": self.handle_new_main_player,
-            "move_player": self.handle_move_player,
-            "chat_message": self.handle_chat_message,
-        }
-        handler = handlers.get(message["type"])
-        if handler:
-            await handler(client_id, message['data'])
-        else:
-            print(f"Unknown message type: {message['type']}")
     
     async def handle_new_main_player(self, client_id: str, data: Dict[str, any]):
         player = {
