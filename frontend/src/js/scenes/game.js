@@ -71,7 +71,6 @@ export default class GameScene extends Phaser.Scene {
         messageInput.addEventListener('blur', this.onMessageInputBlur.bind(this));
 
         document.getElementById('gameContainer')?.addEventListener('click', () => {
-            console.log("GAME CLICKED")
             // If gameContainer is clicked, then unfocus chat box
             const activeElement = document.activeElement;
             if (activeElement && activeElement.tagName === 'INPUT') {
@@ -116,6 +115,7 @@ export default class GameScene extends Phaser.Scene {
         this.networkManager.on('update_players', this.updatePlayersHandler.bind(this));
         this.networkManager.on('disconnect_player', this.disconnectPlayerHandler.bind(this));
         this.networkManager.on('chat_message', this.createChatMessageHandler.bind(this));
+        this.networkManager.on('start_player_attack', this.startPlayerAttackHandler.bind(this));
         // this.networkManager.on('player_data', playerDataHandler.bind(this));
     }
 
@@ -134,8 +134,17 @@ export default class GameScene extends Phaser.Scene {
         messageInput.value = ''; // Clear the input field after sending the message
     }
 
+    async sendStartPlayerAttackMessage(direction) {
+        await this.networkManager?.sendMessage(
+            'start_player_attack',
+            {
+                direction: direction
+            }
+        )
+    }
+
+
     async sendNewPlayerMessage() {
-        console.log("Sending new player message");
         await this.networkManager?.sendMessage(
             'new_main_player',
             {
@@ -328,6 +337,7 @@ export default class GameScene extends Phaser.Scene {
                 const direction = this.getDirectionToMouse();
                 // console.log("direction:", direction);
                 this.player.startNewAttack(direction);
+                this.sendStartPlayerAttackMessage(direction);
             }
         }
     }
@@ -488,6 +498,13 @@ export default class GameScene extends Phaser.Scene {
         const player = this.displayChatMessage(data.client_id, data.message);
     }
 
+    /**
+     * @param {any} data
+     */
+    startPlayerAttackHandler(data) {
+        const player = this.players[data.client_id];
+        player.startNewAttack(data.direction);
+    }
 
     /**
      * @param {any} data

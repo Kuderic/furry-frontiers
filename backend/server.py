@@ -62,6 +62,7 @@ class ConnectionManager:
             "new_main_player": self.handle_new_main_player,
             "move_player": self.handle_move_player,
             "chat_message": self.handle_chat_message,
+            "start_player_attack": self.handle_start_player_attack,
         }
         handler = handlers.get(message["type"])
         if handler:
@@ -155,6 +156,14 @@ class ConnectionManager:
         }
         await self.broadcast_message(out_message)
         logger.info(f"{self.player_list[client_id]['name']} says {data['message']}")
+
+    async def handle_start_player_attack(self, client_id: str, data: Dict[str, any]):
+        out_message = {
+            "type": "start_player_attack",
+            "client_id": client_id,
+            "direction": data.get("direction", 0)
+        }
+        await self.broadcast_message(out_message)
     
 
 app = FastAPI()
