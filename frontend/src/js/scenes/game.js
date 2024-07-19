@@ -7,6 +7,7 @@ const WORLD_WIDTH = 4000;
 const WORLD_HEIGHT = 3000;
 const MOBILE_ZOOM_SCALE = 0.7;
 const THROTTLE_INTERVAL = 100;
+const MINIMUM_FORCE_ATTACK_JOYSTICK = 20;
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -42,6 +43,18 @@ export default class GameScene extends Phaser.Scene {
 
     update() {
         this.updatePlayer();
+        
+        if (this.isMobile && this.shootJoyStick) {
+            this.handleShootJoystickInput();
+        }
+    }
+
+    handleShootJoystickInput() {
+        if (this.shootJoyStick.force > MINIMUM_FORCE_ATTACK_JOYSTICK) {
+            this.startAttacking();            
+        } else {
+            this.stopAttacking();
+        }
     }
 
     handleEnterPress() {
@@ -305,7 +318,6 @@ export default class GameScene extends Phaser.Scene {
             if (pointer.x >= this.cameras.main.width * JOYSTICK_DIVIDER_RATIO) {
               this.shootJoyStick.base.setPosition(pointer.x, pointer.y).setAlpha(0.5)
               this.shootJoyStick.thumb.setPosition(pointer.x, pointer.y).setAlpha(1)
-              this.startAttacking();
             }
           })
         
@@ -316,7 +328,6 @@ export default class GameScene extends Phaser.Scene {
                 this.movementJoyStick.thumb.setAlpha(0.5)
             }
             if (!this.shootJoyStick.force) {
-                this.stopAttacking();
                 this.shootJoyStick.base.setAlpha(0.25)
                 this.shootJoyStick.thumb.setAlpha(0.5)
             }
@@ -364,7 +375,7 @@ export default class GameScene extends Phaser.Scene {
         this.player.setVelocity(0, 0);
 
         if (this.isMobile) {
-            this.handleJoyStickInput();
+            this.handleMovementJoyStickInput();
         } else {
             this.handleKeyboardMovement();
         }
@@ -395,7 +406,7 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
-    handleJoyStickInput() { 
+    handleMovementJoyStickInput() { 
         // Joystick movement
         if (!this.isMobile) {
             console.log("can't handle joysticks on PC");
