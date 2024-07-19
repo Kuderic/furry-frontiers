@@ -12,6 +12,11 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image("grass1", new URL(`../../assets/images/grass1.png`, import.meta.url).toString());
         this.load.image("furry-frontiers", new URL(`../../assets/images/furry-frontiers.webp`, import.meta.url).toString());
 
+        // Particle
+        this.load.image("scratch", new URL(`../../assets/images/scratch_01.png`, import.meta.url).toString());
+        this.load.spritesheet("melee", new URL(`../../assets/images/melee.png`, import.meta.url).toString(),
+            { frameWidth: 180, frameHeight: 180 }); // 10 frames
+
         this.load.image("blue-button-medium", new URL(`../../assets/images/blue-button-medium.png`, import.meta.url).toString());
         this.load.image("blue-button-medium-pressed", new URL(`../../assets/images/blue-button-medium-pressed.png`, import.meta.url).toString());
         this.load.image("joy", new URL(`../../assets/images/wolf.png`, import.meta.url).toString());

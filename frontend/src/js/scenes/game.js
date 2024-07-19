@@ -3,10 +3,8 @@ import Player from '../utils/player';
 import GrassGenerator from '../utils/grass-generator';
 import NetworkManager from '../utils/network-manager';
 
-import expBar from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-
-const WORLD_WIDTH = 3000;
-const WORLD_HEIGHT = 2000;
+const WORLD_WIDTH = 4000;
+const WORLD_HEIGHT = 3000;
 const MOBILE_ZOOM_SCALE = 0.7;
 const THROTTLE_INTERVAL = 100;
 
@@ -204,14 +202,12 @@ export default class GameScene extends Phaser.Scene {
     addMouseInput() {
         this.input.on('pointerdown', (/** @type {{ x: number; y: any; }} */ pointer) => {
             if (this.input.mousePointer.rightButtonDown()) {
-                console.log("Attacking = true")
                 this.attacking = true;
             }
         })
         this.input.on('pointerup', (/** @type {{ x: number; y: any; }} */ pointer) => {
             if (this.input.mousePointer.rightButtonReleased()) {
-                console.log("Attacking = false")
-                this.attacking = true;
+                this.attacking = false;
             }
         })
     }
@@ -325,6 +321,12 @@ export default class GameScene extends Phaser.Scene {
         }
         if (!this.isTyping) {
             this.handlePlayerMovement();
+        }
+
+        if (this.attacking) {
+            if (!this.player.attacking) {
+                this.player.startNewAttack();
+            }
         }
     }
 

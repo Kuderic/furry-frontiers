@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-export class Character extends Phaser.Physics.Arcade.Sprite {
+export default class Character extends Phaser.Physics.Arcade.Sprite {
     /**
      * @param {Phaser.Scene} scene
      * @param {number} x
@@ -11,6 +11,7 @@ export class Character extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, name) {
         super(scene, x, y, texture);
         this.name = name;
+        this.attacking = false;
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -60,6 +61,9 @@ export class Character extends Phaser.Physics.Arcade.Sprite {
         // }
 
         // this.drawHealthBar();
+    }
+
+    startNewAttack() {
     }
 
     // /**
