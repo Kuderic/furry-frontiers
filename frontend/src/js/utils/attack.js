@@ -26,7 +26,9 @@ export default class Attack extends Phaser.Physics.Arcade.Sprite {
 
         this.offset = this.calculateOffset();
         this.setPosition(character.x + this.offset.x, character.y + this.offset.y, 3);
-        this.setRotation(this.direction);
+        this.setRotation(this.direction + 3.5);
+
+        this.setTint(0xffffff);
 
         // Add to the scene
         scene.add.existing(this);
