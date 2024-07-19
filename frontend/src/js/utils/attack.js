@@ -63,8 +63,8 @@ export default class Attack extends Phaser.Physics.Arcade.Sprite {
 
     calculateOffset() {
         // Calculate offset from parent
-        const x = -1 * Math.cos(this.direction) * (this.character.displayWidth / 2 + this.displayWidth/3);
-        const y = -1 * Math.sin(this.direction) * (this.character.displayHeight / 2 + this.displayHeight/3);
+        const x = Math.cos(this.direction) * (this.character.displayWidth / 2 + this.displayWidth/3);
+        const y = Math.sin(this.direction) * (this.character.displayHeight / 2 + this.displayHeight/3);
         return {x, y};
     }
 

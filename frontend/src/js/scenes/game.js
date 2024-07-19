@@ -25,7 +25,7 @@ export default class GameScene extends Phaser.Scene {
         }
         this.cameras.main.setBackgroundColor('#457237');
         this.isMobile = this.registry.get('isMobile');
-        // this.isMobile = true;
+        this.isMobile = true;
 
         this.createGameUI();
         await this.createNetworkManager();
@@ -213,12 +213,12 @@ export default class GameScene extends Phaser.Scene {
     addMouseInput() {
         this.input.on('pointerdown', (/** @type {{ x: number; y: any; }} */ pointer) => {
             if (this.input.mousePointer.rightButtonDown()) {
-                this.attacking = true;
+                this.startAttacking();
             }
         })
         this.input.on('pointerup', (/** @type {{ x: number; y: any; }} */ pointer) => {
             if (this.input.mousePointer.rightButtonReleased()) {
-                this.attacking = false;
+                this.stopAttacking();
             }
         })
     }
@@ -263,12 +263,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     startAttacking() {
-        console.log("start attacking");
         this.attacking = true;
     }
 
     stopAttacking() {
-        console.log("stop attacking");
         this.attacking = false;
     }
 
@@ -336,7 +334,12 @@ export default class GameScene extends Phaser.Scene {
 
         if (this.attacking) {
             if (!this.player.attacking) {
-                const direction = this.getDirectionToMouse();
+                let direction = undefined;
+                if (this.isMobile) {
+                    direction = this.shootJoyStick.rotation;
+                } else {
+                    direction = this.getDirectionToMouse();
+                }
                 // console.log("direction:", direction);
                 this.player.startNewAttack(direction);
                 this.sendStartPlayerAttackMessage(direction);
@@ -351,7 +354,7 @@ export default class GameScene extends Phaser.Scene {
         }
         const mouseX = this.input.mousePointer.worldX;
         const mouseY = this.input.mousePointer.worldY;
-        return Phaser.Math.Angle.Between(mouseX, mouseY, this.player.x, this.player.y);
+        return Phaser.Math.Angle.Between(this.player.x, this.player.y, mouseX, mouseY);
     }
 
     handlePlayerMovement() {
