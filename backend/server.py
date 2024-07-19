@@ -147,6 +147,8 @@ class ConnectionManager:
         await self.broadcast_message(out_message)
     
     async def handle_chat_message(self, client_id: str, data: Dict[str, any]):
+        # Log the new main player to connections.log
+        logger.info(f"{self.player_list[client_id].name} says {data['message']}")
         out_message = {
             "type": "chat_message",
             "client_id": client_id,

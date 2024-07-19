@@ -97,6 +97,7 @@ export default class GameScene extends Phaser.Scene {
             }
         )
         messageInput.value = ''; // Clear the input field after sending the message
+        this.onMessageInputBlur(); // deselect
     }
 
     async sendNewPlayerMessage() {
@@ -181,11 +182,35 @@ export default class GameScene extends Phaser.Scene {
     }
 
     setUpControls() {
+        this.addZoomControls();
         if (this.isMobile) {
             this.createJoySticks();
         } else {
             this.addMouseAndKeyboardInput();
         }
+    }
+
+    addZoomControls() {
+        this.input.on("wheel",  (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+            const camera = this.cameras.main;
+            if (deltaY > 0) {
+                var newZoom = camera.zoom -.1;
+                if (newZoom > 0.6) {
+                    camera.zoom = newZoom;     
+                }
+            }
+            
+            if (deltaY < 0) {
+                var newZoom = camera.zoom +.1;
+                if (newZoom < 1.3) {
+                    camera.zoom = newZoom;     
+                }
+            }
+
+            // this.camera.centerOn(pointer.worldX, pointer.worldY);
+            // this.camera.pan(pointer.worldX, pointer.worldY, 2000, "Power2");
+            
+        });
     }
 
     startAttacking() {

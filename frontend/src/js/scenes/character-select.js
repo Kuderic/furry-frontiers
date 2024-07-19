@@ -29,6 +29,10 @@ export default class CharacterSelectScene extends Phaser.Scene {
             text: 'Start',
             callback: () => this.startGame()
         });
+        
+        this.input.keyboard?.on('keydown-ENTER', () => {
+            this.startGame();
+        })
     }
 
     startGame() {

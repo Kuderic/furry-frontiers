@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
 
+import Attack from './attack.js';
+
 export default class MeleeAttack extends Attack {
     /**
-     * @param {Phaser.Scene} scene
      */
-    constructor(scene) {
-        super(scene);
+    constructor() {
+        super();
 
         // add tween or animation for particle
     }
