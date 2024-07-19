@@ -76,10 +76,15 @@ export default class GameUIScene extends Phaser.Scene {
         const canvasWidth = this.game.canvas.width;
         const canvasHeight = this.game.canvas.height;
 
+        const minimapTopLeft = {
+            x: canvasWidth - this.minimapWidth - 10,
+            y: 10
+        };
+
         // VERY IMPORTANT: ADD CAMERA TO THE GAME SCENE, NOT THIS SCENE
         this.minimapCamera = this.gameScene.cameras.add(
-            canvasWidth - this.minimapWidth - 10, // x position (10px padding from right)
-            10,                        // y position (10px padding from top)
+            minimapTopLeft.x,
+            minimapTopLeft.y,
             this.minimapWidth,
             this.minimapHeight
         );
@@ -91,6 +96,17 @@ export default class GameUIScene extends Phaser.Scene {
         } else {
             console.error("Player is not available in the GameScene.");
         }
+
+
+        // Add the minimap border image to the correct scene
+        this.minimapBorder = this.add.image(
+            minimapTopLeft.x + this.minimapWidth/2,
+            minimapTopLeft.y + this.minimapHeight/2,
+            'wood-minimap-border'
+        );
+
+        // Set the border size to be slightly bigger than the minimap camera
+        this.minimapBorder.setDisplaySize(this.minimapWidth + 15, this.minimapHeight + 15);
     }
     CreateLineExpBar() {
         const COLOR_PRIMARY = 0x9965cc;

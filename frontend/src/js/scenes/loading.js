@@ -23,12 +23,12 @@ export default class LoadingScene extends Phaser.Scene {
         this.load.image("joystick", new URL(`../../assets/images/joystick.png`, import.meta.url).toString());
         this.load.image("mute", new URL(`../../assets/images/mute.png`, import.meta.url).toString());
         this.load.image("unmute", new URL(`../../assets/images/unmute.png`, import.meta.url).toString());
+        this.load.image("wood-minimap-border", new URL(`../../assets/images/wood-minimap-border.webp`, import.meta.url).toString());
 
         // Sounds
         this.load.audio("background-music", new URL(`../../assets/sounds/background-music.mp3`, import.meta.url).toString());
         this.load.audio("melee-attack", new URL(`../../assets/sounds/melee-attack.wav`, import.meta.url).toString());
         this.load.audio("select", new URL(`../../assets/sounds/select.wav`, import.meta.url).toString());
-        this.load.audio("grass-move", new URL(`../../assets/sounds/grass-move.mp3`, import.meta.url).toString());
         this.load.audio("grass-move", new URL(`../../assets/sounds/grass-move.mp3`, import.meta.url).toString());
 
         this.load.bitmapFont('rainyhearts',
