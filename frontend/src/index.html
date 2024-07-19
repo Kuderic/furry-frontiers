@@ -15,7 +15,9 @@
         <div id="chatBox">
             <ul id="messagesList" tabindex="-1"></ul>
             <hr>
-            <input type="text" id="messageInput" autocomplete="off" placeholder="Type your message here">
+            <form id="chatForm" autcomplete="off" onsubmit="chatFormSubmit(event)">
+                <input type="text" id="messageInput" autocomplete="off" placeholder="Type your message here">
+            </form>
         </div>
     </div>
     <script type="module" src="js/main.js"></script>

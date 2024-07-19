@@ -59,7 +59,9 @@ export default class GameScene extends Phaser.Scene {
 
     setUpChatBox() {
         this.showChatBox();
-        // window.stopPropagation = this.stopPropagation;
+        
+        // @ts-ignore
+        window.chatFormSubmit = this.chatFormSubmit.bind(this);
 
         const messageInput = document.getElementById('messageInput');
         if (!messageInput) {
@@ -78,6 +80,15 @@ export default class GameScene extends Phaser.Scene {
                 activeElement.blur();
             }
         });
+    }
+
+    /**
+     * @param {{ preventDefault: () => void; }} event
+     */
+    chatFormSubmit(event) {
+        console.log("chat form submit");
+        event.preventDefault();
+        this.sendChatMessage();
     }
 
     showChatBox() {
@@ -222,7 +233,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     addZoomControls() {
-        this.input.on("wheel",  (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+        this.input.on("wheel",  (/** @type {any} */ pointer, /** @type {any} */ gameObjects, /** @type {any} */ deltaX, /** @type {number} */ deltaY, /** @type {any} */ deltaZ) => {
             const camera = this.cameras.main;
             if (deltaY > 0) {
                 var newZoom = camera.zoom -.1;
@@ -413,7 +424,6 @@ export default class GameScene extends Phaser.Scene {
      * @param {any} message
      */
     displayChatMessage(playerId, message) {
-        console.log(playerId,"spoke");
         // this.players[playerId].say(message);
 
         let messagesList = document.getElementById("messagesList");
