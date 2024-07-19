@@ -42,6 +42,8 @@ export default class Attack extends Phaser.Physics.Arcade.Sprite {
         // // Listen for collision with enemies
         // this.setupCollision(scene);
         
+        scene.sound.play('melee-attack', {volume : 0.8});
+        
         // Timed callback to destroy this
         this.scene.time.delayedCall(this.duration, () => {
             this.destroy();
@@ -61,9 +63,8 @@ export default class Attack extends Phaser.Physics.Arcade.Sprite {
 
     calculateOffset() {
         // Calculate offset from parent
-        const x = -1 * Math.cos(this.direction) * (this.character.displayWidth / 2 + 15);
-        const y = -1 * Math.sin(this.direction) * (this.character.displayHeight / 2 + 15);
-        console.log(x, y);
+        const x = -1 * Math.cos(this.direction) * (this.character.displayWidth / 2 + this.displayWidth/3);
+        const y = -1 * Math.sin(this.direction) * (this.character.displayHeight / 2 + this.displayHeight/3);
         return {x, y};
     }
 

@@ -36,6 +36,8 @@ export default class GameScene extends Phaser.Scene {
 
         // Attach sendMessage to the window object
         this.setUpChatBox();
+
+        this.sound.play('background-music', {volume : 0.2});
     }
 
     update() {
