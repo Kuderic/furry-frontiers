@@ -44,9 +44,21 @@ export default class GameScene extends Phaser.Scene {
         this.updatePlayer();
     }
 
+    handleEnterPress() {
+        console.log('Enter key pressed');
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput) {
+            if (document.activeElement === messageInput) {
+                this.sendChatMessage();
+                messageInput?.blur();
+            } else {
+                messageInput?.focus();
+            }
+        }
+    }
+
     setUpChatBox() {
         this.showChatBox();
-        window.sendChatMessage = this.sendChatMessage.bind(this);
         // window.stopPropagation = this.stopPropagation;
 
         const messageInput = document.getElementById('messageInput');
@@ -54,8 +66,18 @@ export default class GameScene extends Phaser.Scene {
             console.error("Message Input box not found");
             return;
         }
+
         messageInput.addEventListener('focus', this.onMessageInputFocus.bind(this));
         messageInput.addEventListener('blur', this.onMessageInputBlur.bind(this));
+
+        document.getElementById('gameContainer')?.addEventListener('click', () => {
+            console.log("GAME CLICKED")
+            // If gameContainer is clicked, then unfocus chat box
+            const activeElement = document.activeElement;
+            if (activeElement && activeElement.tagName === 'INPUT') {
+                activeElement.blur();
+            }
+        });
     }
 
     showChatBox() {
@@ -66,11 +88,13 @@ export default class GameScene extends Phaser.Scene {
     }
     
     onMessageInputFocus() {
-        this.input.keyboard?.clearCaptures();
+        console.log("input focused");
+        this.isTyping = true;
     }
 
     onMessageInputBlur() {
-        this.addKeyboardInput();
+        console.log("input blurred");
+        this.isTyping = false;
     }
 
     async createNetworkManager() {
@@ -86,9 +110,11 @@ export default class GameScene extends Phaser.Scene {
         // this.networkManager.on('player_data', playerDataHandler.bind(this));
     }
 
-    async sendChatMessage(event) {
-        event.preventDefault(); // Used to stop form reloading page
+    async sendChatMessage() {
         let messageInput = document.getElementById("messageInput");
+        if (messageInput?.value === '') {
+            return;
+        }
         console.log("Sending chat message");
         await this.networkManager?.sendMessage(
             'chat_message',
@@ -97,7 +123,6 @@ export default class GameScene extends Phaser.Scene {
             }
         )
         messageInput.value = ''; // Clear the input field after sending the message
-        this.onMessageInputBlur(); // deselect
     }
 
     async sendNewPlayerMessage() {
@@ -156,11 +181,15 @@ export default class GameScene extends Phaser.Scene {
             'left': Phaser.Input.Keyboard.KeyCodes.A,
             'down': Phaser.Input.Keyboard.KeyCodes.S,
             'right': Phaser.Input.Keyboard.KeyCodes.D,
-        })
+            'enter': Phaser.Input.Keyboard.KeyCodes.ENTER
+            },
+            false
+        )
+
+        this.keys.enter.on('down', this.handleEnterPress.bind(this));
     }
 
-    addMouseAndKeyboardInput() {
-        this.addKeyboardInput();
+    addMouseInput() {
         this.input.on('pointerdown', (/** @type {{ x: number; y: any; }} */ pointer) => {
             if (this.input.mousePointer.rightButtonDown()) {
                 console.log("Attacking = true")
@@ -186,7 +215,8 @@ export default class GameScene extends Phaser.Scene {
         if (this.isMobile) {
             this.createJoySticks();
         } else {
-            this.addMouseAndKeyboardInput();
+            this.addMouseInput();
+            this.addKeyboardInput();
         }
     }
 
@@ -281,7 +311,9 @@ export default class GameScene extends Phaser.Scene {
             console.log("Waiting for player to be created");
             return;
         }
-        this.handlePlayerMovement();
+        if (!this.isTyping) {
+            this.handlePlayerMovement();
+        }
     }
 
     handlePlayerMovement() {
@@ -314,7 +346,6 @@ export default class GameScene extends Phaser.Scene {
             if (this.lastSentVelocity.x != this.player.body?.velocity.x ||
                 this.lastSentVelocity.y != this.player.body?.velocity.x)
             {
-                console.log("They are not equal.");
                 this.sendMovePlayerMessage();
                 this.lastSentTime = currentTime;
                 this.lastSentVelocity.x = this.player.body?.velocity.x;
